@@ -1,6 +1,6 @@
 # Statistical Performance Indicators Dashboard
 
-Public English R Shiny dashboard for the World Bank Statistical Performance
+Public Dashboard for the World Bank Statistical Performance
 Indicators (SPI).
 
 ## Launch
