@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="artifact-source" content=".cg-docs/brainstorms/2026-08-06-spi-shiny-dashboard.md">
+<meta name="artifact-source-sha256" content="9dd693980894360a585632a7b41292fa997272dad252616b24c3613d276db29d">
+<meta name="publication-provenance-schema" content="2">
+<meta name="publication-output" content=".cg-docs/views/brainstorms/2026-08-06-spi-shiny-dashboard.html">
+<meta name="publication-theme" content="reference">
+<meta name="artifact-renderer-version" content="0.1.0">
+<title>SPI Shiny Dashboard Reconstruction · Compound GPID</title>
+<style>:root {
+  color-scheme: light;
+  --paper: #f6f5f0;
+  --surface: #ffffff;
+  --ink: #17212b;
+  --muted: #59636d;
+  --line: #c8cdd1;
+  --accent: #006b5f;
+  --accent-strong: #004d45;
+  --signal: #a63d21;
+  --code: #eef1f3;
+  --focus: #d43f00;
+  --measure: 78rem;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); color: var(--ink); scroll-behavior: smooth; }
+body { margin: 0; min-width: 20rem; }
+a { color: var(--accent-strong); text-underline-offset: .18em; }
+a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.skip-link { position: absolute; left: .75rem; top: -5rem; z-index: 10; background: var(--ink); color: white; padding: .6rem .8rem; }
+.skip-link:focus { top: .75rem; }
+.masthead { border-bottom: 1px solid var(--line); background: var(--surface); }
+.masthead-inner { max-width: var(--measure); margin: 0 auto; padding: 1.6rem clamp(1rem, 4vw, 3rem); }
+.eyebrow { margin: 0 0 .45rem; color: var(--accent-strong); font-size: .78rem; font-weight: 750; text-transform: uppercase; }
+h1, h2, h3, h4, h5, h6 { font-family: "Iowan Old Style", "Palatino Linotype", serif; line-height: 1.16; margin: 1.5em 0 .55em; overflow-wrap: anywhere; }
+h1 { margin: 0; font-size: 3.4rem; }
+.deck { max-width: 58rem; margin: .75rem 0 0; color: var(--muted); }
+.layout { max-width: var(--measure); margin: 0 auto; display: grid; grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); padding: 2rem clamp(1rem, 4vw, 3rem) 4rem; }
+.sidebar { align-self: start; position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; border-left: 4px solid var(--accent); padding-left: 1rem; }
+.sidebar h2 { font-family: inherit; font-size: .82rem; text-transform: uppercase; margin: 0 0 .7rem; }
+.sidebar ul { list-style: none; margin: 0; padding: 0; }
+.sidebar li + li { margin-top: .45rem; }
+main { min-width: 0; }
+.derived-panel { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1rem 0; margin: 0 0 1.5rem; }
+.derived-panel h2 { font-size: 1.3rem; margin: 0 0 .65rem; }
+.phase-list, .coverage-list { display: grid; gap: .55rem; padding-left: 1.25rem; }
+.source-block { min-width: 0; }
+.source-block > :first-child { margin-top: 0; }
+.source-heading { scroll-margin-top: 1rem; }
+p, li, td, th, code { overflow-wrap: anywhere; }
+pre { max-width: 100%; overflow: auto; padding: 1rem; background: var(--code); border-left: 4px solid var(--accent); white-space: pre; }
+code { font-family: "SFMono-Regular", Consolas, monospace; font-size: .88em; }
+:not(pre) > code { background: var(--code); padding: .08em .3em; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; margin: 1rem 0 1.5rem; }
+th, td { border: 1px solid var(--line); padding: .55rem .7rem; text-align: left; vertical-align: top; min-width: 8rem; }
+th { background: #e6ece9; }
+blockquote { margin: 1rem 0; padding: .2rem 0 .2rem 1rem; border-left: 4px solid var(--signal); color: var(--muted); }
+.raw-source { border: 1px solid var(--line); margin: 1rem 0; }
+.raw-source figcaption { padding: .45rem .7rem; background: #f0e9e5; font-weight: 700; }
+.raw-source pre { margin: 0; border: 0; }
+.provenance { border-top: 1px solid var(--line); background: var(--surface); }
+.provenance-inner { max-width: var(--measure); margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem); }
+.provenance dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .35rem 1rem; }
+.provenance dt { font-weight: 700; }
+.provenance dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 48rem) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; max-height: none; border-left: 0; border-bottom: 1px solid var(--line); padding: 0 0 1rem; }
+  h1 { font-size: 2.15rem; }
+  .provenance dl { grid-template-columns: 1fr; }
+  .provenance dd + dt { margin-top: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+@media print {
+  :root { --paper: #fff; --surface: #fff; --ink: #000; --muted: #222; }
+  @page { margin: 15mm; }
+  .skip-link, .sidebar { display: none; }
+  .layout { display: block; max-width: none; padding: 0; }
+  .masthead-inner, .provenance-inner { max-width: none; padding: 0; }
+  .masthead { border: 0; margin-bottom: 1rem; }
+  a { color: #000; text-decoration: underline; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: .8em; }
+  pre, table, blockquote, .raw-source { break-inside: avoid; }
+  thead { display: table-header-group; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  .provenance { margin-top: 1rem; }
+}</style>
+<script id="artifact-provenance" type="application/json">{"documentType":"brainstorm","generatedAt":"2026-08-06T18:21:38Z","outputPath":".cg-docs/views/brainstorms/2026-08-06-spi-shiny-dashboard.html","provenanceSchemaVersion":2,"rendererVersion":"0.1.0","sourcePath":".cg-docs/brainstorms/2026-08-06-spi-shiny-dashboard.md","sourceSha256":"9dd693980894360a585632a7b41292fa997272dad252616b24c3613d276db29d","themeName":"reference","themeVersion":1}</script>
+</head>
+<body data-artifact-kind="brainstorm">
+<a class="skip-link" href="#main-content">Skip to artifact content</a>
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">Decision record</p>
+    <h1>SPI Shiny Dashboard Reconstruction</h1>
+    <p class="deck">A complete human view of the canonical Brainstorm, organized around alternatives and the chosen direction. <a href="../../brainstorms/2026-08-06-spi-shiny-dashboard.md">Open canonical Markdown</a>.</p>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Artifact sections" data-derived="navigation">
+    <h2>On this page</h2>
+    <ul><li><a href="#context">Context</a></li><li><a href="#requirements">Requirements</a></li><li><a href="#approaches-considered">Approaches</a></li><li><a href="#decision">Decision</a></li><li><a href="#next-steps">Next steps</a></li><li><a href="#provenance-heading">Provenance</a></li></ul>
+  </nav>
+  <main id="main-content" tabindex="-1">
+    <section class="derived-panel" data-derived="approach-index" aria-labelledby="approach-index"><h2 id="approach-index">Approach index</h2><ol><li>Approach 1: Full golem structure first</li><li>Approach 2: Minimal golem foundation plus Overview</li><li>Approach 3: Reproduce the reference dashboard structure first</li></ol></section>
+    <article aria-label="Canonical artifact content">
+      <div class="source-block source-heading" id="render-owner-0002" data-source-block="block-0002" data-source-lines="11-11"><h1 id="spi-shiny-dashboard-reconstruction">SPI Shiny Dashboard Reconstruction</h1></div>
+<div class="source-block source-heading" id="render-owner-0004" data-source-block="block-0004" data-source-lines="13-13"><h2 id="context">Context</h2></div>
+<div class="source-block" id="render-owner-0006" data-source-block="block-0006" data-source-lines="15-18"><p>The current Statistical Performance Indicators (SPI) webpage is a useful first point of access, but the project needs a simpler and clearer public experience for exploring the SPI index. The new dashboard should also be easy to modify, reproduce, and update when new SPI years or package changes become available.</p></div>
+<div class="source-block" id="render-owner-0008" data-source-block="block-0008" data-source-lines="20-24"><p>The dashboard will rebuild and extend the current SPI experience using R Shiny and the golem framework. The existing <code>functions/</code> and <code>viz_functions/</code> folders contain the initial R data and visualization functions. The <code>spiR</code> package is the intended data source and will become available on CRAN; local functions remain available during the transition.</p></div>
+<div class="source-block" id="render-owner-0010" data-source-block="block-0010" data-source-lines="26-29"><p>The mockup at <code>C:/Users/wb661551/Downloads/dashboard_mockup.html</code> is the initial product reference. The <code>InnovationHubDashboard</code> repository and the World Bank Innovation Hub website are architectural and design references, not the source of truth for this project.</p></div>
+<div class="source-block source-heading" id="render-owner-0012" data-source-block="block-0012" data-source-lines="31-31"><h2 id="requirements">Requirements</h2></div>
+<div class="source-block" id="render-owner-0014" data-source-block="block-0014" data-source-lines="33-52"><ul><li>The application must be publicly accessible without authentication.</li><li>The initial application language is English.</li><li>The project must use R Shiny and the golem framework.</li><li>The repository must be organized around reproducible, maintainable modules.</li><li>Data acquisition and transformation should be isolated from user-interface modules so future SPI updates do not require rewriting every visualization.</li><li>The Overview map must use Flourish.</li><li>Non-map visualizations should use R-based visualization methods.</li><li>The application should use <code>spiR</code> as the primary data package when available.</li><li>A shared year selector and shared reactive data flow should support all tabs.</li><li>Countries without data for the selected year should not be displayed.</li><li>Countries with partial indicator coverage should be displayed using available data.</li><li>Regional and income-group aggregates should be displayed when observations are limited, using the available observations.</li><li>New years and changes in <code>spiR</code> column names should be accommodated through the data interface rather than hard-coded independently in each tab.</li><li>Downloads in CSV, Excel, and Stata formats are not required for the first milestone.</li><li>Work will continue directly on <code>main</code>; no feature branches are required.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0016" data-source-block="block-0016" data-source-lines="54-54"><h2 id="milestones">Milestones</h2></div>
+<div class="source-block source-heading" id="render-owner-0018" data-source-block="block-0018" data-source-lines="56-56"><h3 id="milestone-1-repository-setup-and-global-overview">Milestone 1: Repository Setup and Global Overview</h3></div>
+<div class="source-block" id="render-owner-0020" data-source-block="block-0020" data-source-lines="58-64"><ul><li>Establish the minimal golem application structure.</li><li>Organize the existing data and visualization functions.</li><li>Define stable shared data interfaces for the application modules.</li><li>Integrate <code>spiR</code>, with local functions available during the transition.</li><li>Implement the shared year selector and core Overview filters.</li><li>Implement the Overview tab with the Flourish map and summary views.</li><li>Leave the repository reproducible, ordered, and easy to update.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0022" data-source-block="block-0022" data-source-lines="66-66"><h3 id="milestone-2-country-explorer">Milestone 2: Country Explorer</h3></div>
+<div class="source-block" id="render-owner-0024" data-source-block="block-0024" data-source-lines="68-69"><p>Add country browsing and filtering by region, income level, fragile and conflict status, and country search.</p></div>
+<div class="source-block source-heading" id="render-owner-0026" data-source-block="block-0026" data-source-lines="71-71"><h3 id="milestone-3-country-profile">Milestone 3: Country Profile</h3></div>
+<div class="source-block" id="render-owner-0028" data-source-block="block-0028" data-source-lines="73-74"><p>Add country-level scores, pillar performance, trends, strengths, areas for improvement, detailed pillar and dimension scores, and peer comparisons.</p></div>
+<div class="source-block source-heading" id="render-owner-0030" data-source-block="block-0030" data-source-lines="76-76"><h3 id="milestone-4-compare-countries">Milestone 4: Compare Countries</h3></div>
+<div class="source-block" id="render-owner-0032" data-source-block="block-0032" data-source-lines="78-79"><p>Add side-by-side comparison for up to six countries across pillars, trends, and dimensions.</p></div>
+<div class="source-block source-heading" id="render-owner-0034" data-source-block="block-0034" data-source-lines="81-81"><h3 id="milestone-5-trends-and-progress">Milestone 5: Trends and Progress</h3></div>
+<div class="source-block" id="render-owner-0036" data-source-block="block-0036" data-source-lines="83-84"><p>Add global, regional, and income-group trends, improvement and decline views, convergence analysis, and pillar-specific trends.</p></div>
+<div class="source-block source-heading" id="render-owner-0038" data-source-block="block-0038" data-source-lines="86-86"><h3 id="milestone-6-explore-by-pillar">Milestone 6: Explore by Pillar</h3></div>
+<div class="source-block" id="render-owner-0040" data-source-block="block-0040" data-source-lines="88-89"><p>Add pillar-specific exploration, pillar correlations, cross-pillar analysis, and the custom weighting tool.</p></div>
+<div class="source-block source-heading" id="render-owner-0042" data-source-block="block-0042" data-source-lines="91-91"><h3 id="milestone-7-data-and-downloads">Milestone 7: Data and Downloads</h3></div>
+<div class="source-block" id="render-owner-0044" data-source-block="block-0044" data-source-lines="93-94"><p>Add data access, methodology, citation information, and download features when they become a priority.</p></div>
+<div class="source-block source-heading" id="render-owner-0046" data-source-block="block-0046" data-source-lines="96-96"><h2 id="approaches-considered">Approaches Considered</h2></div>
+<div class="source-block source-heading" id="render-owner-0048" data-source-block="block-0048" data-source-lines="98-98"><h3 id="approach-1-full-golem-structure-first">Approach 1: Full golem structure first</h3></div>
+<div class="source-block" id="render-owner-0050" data-source-block="block-0050" data-source-lines="100-101"><p>Create the complete golem skeleton and all planned module placeholders before implementing the Overview.</p></div>
+<div class="source-block" id="render-owner-0052" data-source-block="block-0052" data-source-lines="103-104"><p>This establishes the final architecture early, but delays a working user-facing result and creates structure before the first milestone has been validated.</p></div>
+<div class="source-block source-heading" id="render-owner-0054" data-source-block="block-0054" data-source-lines="106-106"><h3 id="approach-2-minimal-golem-foundation-plus-overview">Approach 2: Minimal golem foundation plus Overview</h3></div>
+<div class="source-block" id="render-owner-0056" data-source-block="block-0056" data-source-lines="108-111"><p>Create only the golem foundation and shared architecture required by the Overview. Organize the existing functions, connect <code>spiR</code>, implement the global data flow, and build the first tab end to end. Add later tabs as independent modules in their own milestones.</p></div>
+<div class="source-block" id="render-owner-0058" data-source-block="block-0058" data-source-lines="113-114"><p>This provides a working vertical slice quickly while preserving modularity and avoiding premature scaffolding. This is the selected approach.</p></div>
+<div class="source-block source-heading" id="render-owner-0060" data-source-block="block-0060" data-source-lines="116-116"><h3 id="approach-3-reproduce-the-reference-dashboard-structure-first">Approach 3: Reproduce the reference dashboard structure first</h3></div>
+<div class="source-block" id="render-owner-0062" data-source-block="block-0062" data-source-lines="118-119"><p>Use <code>InnovationHubDashboard</code> as the initial application skeleton and adapt its patterns to SPI.</p></div>
+<div class="source-block" id="render-owner-0064" data-source-block="block-0064" data-source-lines="121-123"><p>This reduces architectural uncertainty, but risks importing assumptions that do not fit the SPI data model. The reference project will therefore be used for patterns and conventions rather than copied as the project structure.</p></div>
+<div class="source-block source-heading" id="render-owner-0066" data-source-block="block-0066" data-source-lines="125-125"><h2 id="decision">Decision</h2></div>
+<div class="source-block" id="render-owner-0068" data-source-block="block-0068" data-source-lines="127-130"><p>Use Approach 2. The first implementation target is a minimal, maintainable golem foundation plus a complete Overview vertical slice. The Overview is the best first validation because it exercises the full path from data acquisition through shared reactive state to public-facing visualizations.</p></div>
+<div class="source-block" id="render-owner-0070" data-source-block="block-0070" data-source-lines="132-134"><p>The architecture should be based on stable documented data interfaces rather than individual plots. This will allow <code>spiR</code> to evolve and make later tabs independent modules that consume shared prepared data.</p></div>
+<div class="source-block source-heading" id="render-owner-0072" data-source-block="block-0072" data-source-lines="136-136"><h2 id="devil-s-advocate">Devil&#x27;s Advocate</h2></div>
+<div class="source-block" id="render-owner-0074" data-source-block="block-0074" data-source-lines="138-142"><p>The main risk is trying to make the repository fully ready before defining the shared data contract. If the contract is unstable, every future tab may need custom data preparation. The first milestone should therefore validate the normalized data objects consumed by the Overview, including year filtering, country availability, partial coverage, and group aggregates.</p></div>
+<div class="source-block" id="render-owner-0076" data-source-block="block-0076" data-source-lines="144-146"><p>The scope is large, but the milestone structure makes it manageable: the first vertical slice creates immediate value, while the remaining mockup tabs remain planned rather than being treated as out of scope.</p></div>
+<div class="source-block source-heading" id="render-owner-0078" data-source-block="block-0078" data-source-lines="148-148"><h2 id="next-steps">Next Steps</h2></div>
+<div class="source-block" id="render-owner-0080" data-source-block="block-0080" data-source-lines="150-158"><ol><li>Inspect the existing R functions and visualization functions against the mockup&#x27;s Overview requirements.</li><li>Inspect the <code>spiR</code> public API and the reference <code>InnovationHubDashboard</code> architecture.</li><li>Create the minimal golem project structure directly on <code>main</code>.</li><li>Define and document the shared Overview data contract.</li><li>Implement and validate the Overview tab, including the Flourish map integration boundary and summary visualizations.</li><li>Register the seven milestones in the project roadmap.</li></ol></div>
+    </article>
+  </main>
+</div>
+<footer class="provenance" aria-labelledby="provenance-heading">
+  <div class="provenance-inner">
+    <h2 id="provenance-heading">Derived view provenance</h2>
+    <p>This HTML is regenerable. Canonical Markdown remains authoritative.</p>
+    <dl>
+      <dt>Source</dt><dd>.cg-docs/brainstorms/2026-08-06-spi-shiny-dashboard.md</dd>
+      <dt>Source SHA-256</dt><dd><code>9dd693980894360a585632a7b41292fa997272dad252616b24c3613d276db29d</code></dd>
+      <dt>Output</dt><dd>.cg-docs/views/brainstorms/2026-08-06-spi-shiny-dashboard.html</dd>
+      <dt>Document type</dt><dd>brainstorm</dd>
+      <dt>Renderer</dt><dd>0.1.0</dd>
+      <dt>Theme</dt><dd>reference v1</dd>
+      <dt>Generated UTC</dt><dd>2026-08-06T18:21:38Z</dd>
+    </dl>
+  </div>
+</footer>
+</body>
+</html>

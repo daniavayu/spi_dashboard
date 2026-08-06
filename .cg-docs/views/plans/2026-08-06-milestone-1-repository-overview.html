@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="artifact-source" content=".cg-docs/plans/2026-08-06-milestone-1-repository-overview.md">
+<meta name="artifact-source-sha256" content="deb16b6b2a6628489a1444769bb9f98def93ae31fb00e845e16d4e7525d5222a">
+<meta name="publication-provenance-schema" content="2">
+<meta name="publication-output" content=".cg-docs/views/plans/2026-08-06-milestone-1-repository-overview.html">
+<meta name="publication-theme" content="reference">
+<meta name="artifact-renderer-version" content="0.1.0">
+<title>Milestone 1: Repository Setup and Global Overview · Compound GPID</title>
+<style>:root {
+  color-scheme: light;
+  --paper: #f6f5f0;
+  --surface: #ffffff;
+  --ink: #17212b;
+  --muted: #59636d;
+  --line: #c8cdd1;
+  --accent: #006b5f;
+  --accent-strong: #004d45;
+  --signal: #a63d21;
+  --code: #eef1f3;
+  --focus: #d43f00;
+  --measure: 78rem;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); color: var(--ink); scroll-behavior: smooth; }
+body { margin: 0; min-width: 20rem; }
+a { color: var(--accent-strong); text-underline-offset: .18em; }
+a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.skip-link { position: absolute; left: .75rem; top: -5rem; z-index: 10; background: var(--ink); color: white; padding: .6rem .8rem; }
+.skip-link:focus { top: .75rem; }
+.masthead { border-bottom: 1px solid var(--line); background: var(--surface); }
+.masthead-inner { max-width: var(--measure); margin: 0 auto; padding: 1.6rem clamp(1rem, 4vw, 3rem); }
+.eyebrow { margin: 0 0 .45rem; color: var(--accent-strong); font-size: .78rem; font-weight: 750; text-transform: uppercase; }
+h1, h2, h3, h4, h5, h6 { font-family: "Iowan Old Style", "Palatino Linotype", serif; line-height: 1.16; margin: 1.5em 0 .55em; overflow-wrap: anywhere; }
+h1 { margin: 0; font-size: 3.4rem; }
+.deck { max-width: 58rem; margin: .75rem 0 0; color: var(--muted); }
+.layout { max-width: var(--measure); margin: 0 auto; display: grid; grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); padding: 2rem clamp(1rem, 4vw, 3rem) 4rem; }
+.sidebar { align-self: start; position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; border-left: 4px solid var(--accent); padding-left: 1rem; }
+.sidebar h2 { font-family: inherit; font-size: .82rem; text-transform: uppercase; margin: 0 0 .7rem; }
+.sidebar ul { list-style: none; margin: 0; padding: 0; }
+.sidebar li + li { margin-top: .45rem; }
+main { min-width: 0; }
+.derived-panel { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1rem 0; margin: 0 0 1.5rem; }
+.derived-panel h2 { font-size: 1.3rem; margin: 0 0 .65rem; }
+.phase-list, .coverage-list { display: grid; gap: .55rem; padding-left: 1.25rem; }
+.source-block { min-width: 0; }
+.source-block > :first-child { margin-top: 0; }
+.source-heading { scroll-margin-top: 1rem; }
+p, li, td, th, code { overflow-wrap: anywhere; }
+pre { max-width: 100%; overflow: auto; padding: 1rem; background: var(--code); border-left: 4px solid var(--accent); white-space: pre; }
+code { font-family: "SFMono-Regular", Consolas, monospace; font-size: .88em; }
+:not(pre) > code { background: var(--code); padding: .08em .3em; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; margin: 1rem 0 1.5rem; }
+th, td { border: 1px solid var(--line); padding: .55rem .7rem; text-align: left; vertical-align: top; min-width: 8rem; }
+th { background: #e6ece9; }
+blockquote { margin: 1rem 0; padding: .2rem 0 .2rem 1rem; border-left: 4px solid var(--signal); color: var(--muted); }
+.raw-source { border: 1px solid var(--line); margin: 1rem 0; }
+.raw-source figcaption { padding: .45rem .7rem; background: #f0e9e5; font-weight: 700; }
+.raw-source pre { margin: 0; border: 0; }
+.provenance { border-top: 1px solid var(--line); background: var(--surface); }
+.provenance-inner { max-width: var(--measure); margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem); }
+.provenance dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .35rem 1rem; }
+.provenance dt { font-weight: 700; }
+.provenance dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 48rem) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; max-height: none; border-left: 0; border-bottom: 1px solid var(--line); padding: 0 0 1rem; }
+  h1 { font-size: 2.15rem; }
+  .provenance dl { grid-template-columns: 1fr; }
+  .provenance dd + dt { margin-top: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+@media print {
+  :root { --paper: #fff; --surface: #fff; --ink: #000; --muted: #222; }
+  @page { margin: 15mm; }
+  .skip-link, .sidebar { display: none; }
+  .layout { display: block; max-width: none; padding: 0; }
+  .masthead-inner, .provenance-inner { max-width: none; padding: 0; }
+  .masthead { border: 0; margin-bottom: 1rem; }
+  a { color: #000; text-decoration: underline; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: .8em; }
+  pre, table, blockquote, .raw-source { break-inside: avoid; }
+  thead { display: table-header-group; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  .provenance { margin-top: 1rem; }
+}</style>
+<script id="artifact-provenance" type="application/json">{"documentType":"plan","generatedAt":"2026-08-06T18:27:46Z","outputPath":".cg-docs/views/plans/2026-08-06-milestone-1-repository-overview.html","provenanceSchemaVersion":2,"rendererVersion":"0.1.0","sourcePath":".cg-docs/plans/2026-08-06-milestone-1-repository-overview.md","sourceSha256":"deb16b6b2a6628489a1444769bb9f98def93ae31fb00e845e16d4e7525d5222a","themeName":"reference","themeVersion":1}</script>
+</head>
+<body data-artifact-kind="plan">
+<a class="skip-link" href="#main-content">Skip to artifact content</a>
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">Execution contract</p>
+    <h1>Milestone 1: Repository Setup and Global Overview</h1>
+    <p class="deck">A complete human view of the canonical Plan, including phases, requirements, verification, risks, and boundaries. <a href="../../plans/2026-08-06-milestone-1-repository-overview.md">Open canonical Markdown</a>.</p>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Artifact sections" data-derived="navigation">
+    <h2>On this page</h2>
+    <ul><li><a href="#objective">Outcome</a></li><li><a href="#phase-map">Phase map</a></li><li><a href="#1-inventory-the-repository-and-choose-the-golem-boundary">Steps</a></li><li><a href="#requirement-coverage">Requirement coverage</a></li><li><a href="#verification-surface">Verification</a></li><li><a href="#risks-mitigations">Risks</a></li><li><a href="#out-of-scope">Boundaries</a></li><li><a href="#provenance-heading">Provenance</a></li></ul>
+  </nav>
+  <main id="main-content" tabindex="-1">
+    <section class="derived-panel" data-derived="phase-map" aria-labelledby="phase-map"><h2 id="phase-map">Phase map</h2><ol class="phase-list"><li><strong>Phase 1</strong> · Foundation and Data Contract</li><li><strong>Phase 2</strong> · Overview Implementation</li><li><strong>Phase 3</strong> · Validation and Handoff</li></ol></section><section class="derived-panel" data-derived="requirement-coverage" aria-labelledby="requirement-coverage"><h2 id="requirement-coverage">Requirement coverage</h2><ul class="coverage-list"><li><strong>R1</strong> → steps 1, 2, 4, 8, 9</li><li><strong>R2</strong> → steps 1, 3, 4, 8, 9</li><li><strong>R3</strong> → steps 3, 4, 8, 9</li><li><strong>R4</strong> → steps 3, 5, 9</li><li><strong>R5</strong> → steps 3, 5, 8, 9</li><li><strong>R6</strong> → steps 3, 5, 8, 9</li><li><strong>R7</strong> → steps 3, 4, 8, 9</li><li><strong>R8</strong> → steps 2, 5, 6, 7, 8, 9</li><li><strong>R9</strong> → steps 6, 7, 8, 9</li><li><strong>R10</strong> → steps 2, 8, 9</li><li><strong>R11</strong> → steps 1, 9</li></ul></section>
+    <article aria-label="Canonical artifact content">
+      <div class="source-block source-heading" id="render-owner-0002" data-source-block="block-0002" data-source-lines="15-15"><h1 id="plan-milestone-1-repository-setup-and-global-overview">Plan: Milestone 1: Repository Setup and Global Overview</h1></div>
+<div class="source-block source-heading" id="render-owner-0004" data-source-block="block-0004" data-source-lines="17-17"><h2 id="objective">Objective</h2></div>
+<div class="source-block" id="render-owner-0006" data-source-block="block-0006" data-source-lines="19-23"><p>Create a minimal, maintainable golem application foundation and implement the Overview vertical slice for the public SPI dashboard. The result must isolate data acquisition from Shiny modules, use <code>spiR</code> as the primary provider when available, preserve the local functions as a temporary fallback, and expose a stable data interface for later dashboard tabs.</p></div>
+<div class="source-block source-heading" id="render-owner-0008" data-source-block="block-0008" data-source-lines="25-25"><h2 id="context">Context</h2></div>
+<div class="source-block" id="render-owner-0010" data-source-block="block-0010" data-source-lines="27-31"><p>The repository currently contains local R data-access functions under <code>functions/</code> and visualization functions under <code>viz_functions/</code>, but no valid golem application structure. The existing <code>App</code> artifact is not a valid R entry point and must be assessed during foundation work rather than assumed to be reusable.</p></div>
+<div class="source-block" id="render-owner-0012" data-source-block="block-0012" data-source-lines="33-38"><p>The local data functions already expose useful provider operations including <code>spi_index()</code>, <code>spi_aggregates()</code>, and <code>country_info()</code>. The visualization code currently performs its own package loading, relative-path discovery, data loading, and global object creation. Milestone 1 should introduce one application-owned adapter boundary before connecting those visualizations to Shiny.</p></div>
+<div class="source-block" id="render-owner-0014" data-source-block="block-0014" data-source-lines="40-42"><p>The public mockup defines the Overview as a year-aware world view with an SPI map, score distribution, regional summaries, and income-group summaries. The map must use Flourish; non-map charts must use R.</p></div>
+<div class="source-block" id="render-owner-0016" data-source-block="block-0016" data-source-lines="44-46"><p>No <code>compound-gpid.md</code>, <code>compound-gpid.local.md</code>, or <code>roadmap.json</code> currently exists. This plan proceeds from the validated brainstorm and works directly on <code>main</code> without creating branches.</p></div>
+<div class="source-block source-heading" id="render-owner-0018" data-source-block="block-0018" data-source-lines="48-48"><h2 id="requirements">Requirements</h2></div>
+<div class="source-block" id="render-owner-0020" data-source-block="block-0020" data-source-lines="50-62"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Source</th></tr></thead><tbody><tr><td>R1</td><td>Establish a minimal golem application structure.</td><td>Brainstorm / Milestone 1</td></tr><tr><td>R2</td><td>Keep data acquisition and normalization separate from Shiny UI modules.</td><td>Brainstorm decision</td></tr><tr><td>R3</td><td>Use <code>spiR</code> as the primary provider and retain local functions as a temporary fallback.</td><td>Brainstorm requirements</td></tr><tr><td>R4</td><td>Provide normalized index, country metadata, aggregate, year, and indicator interfaces.</td><td>Brainstorm devil&#x27;s advocate</td></tr><tr><td>R5</td><td>Exclude countries with no data for the selected year.</td><td>User requirements</td></tr><tr><td>R6</td><td>Preserve countries with partial indicator coverage and groups with limited observations.</td><td>User requirements</td></tr><tr><td>R7</td><td>Handle new years and upstream column-name changes in one adapter/schema layer.</td><td>Brainstorm requirements</td></tr><tr><td>R8</td><td>Implement an English Overview with a shared year selector and core filters.</td><td>Mockup / Milestone 1</td></tr><tr><td>R9</td><td>Use Flourish for the Overview map and R for non-map visualizations.</td><td>User requirements</td></tr><tr><td>R10</td><td>Keep the app public without authentication and omit downloads from this milestone.</td><td>User requirements</td></tr><tr><td>R11</td><td>Work directly on <code>main</code> without creating branches.</td><td>User decision</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0022" data-source-block="block-0022" data-source-lines="64-64"><h2 id="phase-1-foundation-and-data-contract">Phase 1: Foundation and Data Contract</h2></div>
+<div class="source-block source-heading" id="render-owner-0024" data-source-block="block-0024" data-source-lines="66-66"><h3 id="1-inventory-the-repository-and-choose-the-golem-boundary">1. Inventory the repository and choose the golem boundary</h3></div>
+<div class="source-block" id="render-owner-0026" data-source-block="block-0026" data-source-lines="68-78"><ul><li><strong>Requirements</strong>: R1, R2, R11</li><li><strong>Files</strong>: <code>App</code>, <code>functions/</code>, <code>viz_functions/</code>, new golem project files</li><li><strong>Details</strong>: Confirm the current file types, identify reusable exported and internal functions, classify the existing <code>App</code> artifact, and define the minimal golem layout needed for the Overview. Use the reference dashboard only for architectural patterns. Do not scaffold future tab modules yet.</li><li><strong>Test Scenarios</strong>: the repository can be loaded from its root; no source file depends on an implicit working directory after migration.</li><li><strong>Tests</strong>: repository structure check and clean-session source-loading test.</li><li><strong>Acceptance criteria</strong>: the target golem structure and ownership of each existing function are documented before implementation proceeds.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0028" data-source-block="block-0028" data-source-lines="80-80"><h3 id="2-create-the-minimal-golem-application-foundation">2. Create the minimal golem application foundation</h3></div>
+<div class="source-block" id="render-owner-0030" data-source-block="block-0030" data-source-lines="82-92"><ul><li><strong>Requirements</strong>: R1, R8, R10</li><li><strong>Files</strong>: <code>DESCRIPTION</code>, <code>NAMESPACE</code>, <code>R/</code>, <code>inst/</code>, <code>app.R</code>, golem config</li><li><strong>Details</strong>: Create the smallest valid golem app that can launch a Shiny application in English. Add only dependencies required for the foundation and Overview. Keep the public app unauthenticated. Replace or retire the invalid <code>App</code> entry point only after its role is confirmed.</li><li><strong>Test Scenarios</strong>: app launches from a clean R session; missing optional local fallback does not prevent package loading when <code>spiR</code> is installed.</li><li><strong>Tests</strong>: golem load/launch smoke test and package dependency check.</li><li><strong>Acceptance criteria</strong>: a documented local launch command starts the app shell without requiring files outside the repository.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0032" data-source-block="block-0032" data-source-lines="94-94"><h3 id="3-implement-the-shared-spi-provider-and-normalization-adapter">3. Implement the shared SPI provider and normalization adapter</h3></div>
+<div class="source-block" id="render-owner-0034" data-source-block="block-0034" data-source-lines="96-112"><ul><li><strong>Requirements</strong>: R2, R3, R4, R5, R6, R7</li><li><strong>Files</strong>: <code>R/mod_spi_data.R</code> or equivalent adapter module, provider helpers, <code>tests/testthat/</code></li><li><strong>Details</strong>: Define one application-owned interface for index scores, country metadata, and group aggregates. Prefer <code>spiR::spi_index()</code>, <code>spiR::country_info()</code>, and <code>spiR::spi_aggregates()</code> when available; source local functions only through an explicit fallback path. Normalize identifiers, years, score columns, missing-value sentinels, pillar names, and aggregate labels in this boundary. Derive available years and map-ready records from normalized data rather than hard-coding current years or column names.</li><li><strong>Test Scenarios</strong>: selected year excludes countries without a score; partial indicator coverage remains present; limited group observations remain present; a renamed upstream score column is mapped by the adapter contract.</li><li><strong>Tests</strong>: deterministic <code>testthat</code> fixtures for each scenario plus provider selection tests.</li><li><strong>Acceptance criteria</strong>: Overview modules consume normalized objects only and contain no direct <code>spiR</code> or local-function loading logic.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0036" data-source-block="block-0036" data-source-lines="114-114"><h3 id="4-organize-existing-functions-and-define-reproducible-dependencies">4. Organize existing functions and define reproducible dependencies</h3></div>
+<div class="source-block" id="render-owner-0038" data-source-block="block-0038" data-source-lines="116-129"><ul><li><strong>Requirements</strong>: R1, R2, R3, R7</li><li><strong>Files</strong>: <code>functions/</code>, <code>viz_functions/</code>, <code>DESCRIPTION</code>, <code>renv.lock</code> or chosen dependency manifest, project documentation</li><li><strong>Details</strong>: Move or wrap reusable data and visualization functions into the golem ownership model without duplicating data downloads. Remove ad hoc package installation commands from runtime source. Replace fragile relative paths with package/project resource resolution. Document the temporary local fallback and the transition to the CRAN <code>spiR</code> release.</li><li><strong>Test Scenarios</strong>: clean checkout with declared dependencies; app source does not install packages; data loading works from the project root and launch entry point.</li><li><strong>Tests</strong>: dependency installation/load check and source-loading test.</li><li><strong>Acceptance criteria</strong>: a new contributor can identify where data access, normalization, visualization helpers, and app modules belong.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0040" data-source-block="block-0040" data-source-lines="131-131"><h2 id="phase-2-overview-implementation">Phase 2: Overview Implementation</h2></div>
+<div class="source-block source-heading" id="render-owner-0042" data-source-block="block-0042" data-source-lines="133-133"><h3 id="5-build-the-shared-overview-state-and-controls">5. Build the shared Overview state and controls</h3></div>
+<div class="source-block" id="render-owner-0044" data-source-block="block-0044" data-source-lines="135-145"><ul><li><strong>Requirements</strong>: R4, R5, R6, R8</li><li><strong>Files</strong>: <code>R/mod_overview.R</code>, shared UI/server modules, Overview tests</li><li><strong>Details</strong>: Implement the global year selector and Overview filter state as shared reactive inputs. Populate choices from the adapter&#x27;s available data, preserve valid defaults, and pass filtered normalized data to each Overview output. Keep English UI labels and make the controls stable for later tabs.</li><li><strong>Test Scenarios</strong>: changing year updates all Overview outputs; unavailable countries disappear; groups remain visible when observations are limited.</li><li><strong>Tests</strong>: <code>shiny::testServer()</code> tests for reactive state and filter outputs.</li><li><strong>Acceptance criteria</strong>: all Overview outputs use the same selected year and data snapshot.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0046" data-source-block="block-0046" data-source-lines="147-147"><h3 id="6-implement-the-flourish-map-integration-boundary">6. Implement the Flourish map integration boundary</h3></div>
+<div class="source-block" id="render-owner-0048" data-source-block="block-0048" data-source-lines="149-163"><ul><li><strong>Requirements</strong>: R8, R9</li><li><strong>Files</strong>: <code>R/mod_overview_map.R</code>, Flourish configuration/resource files, documentation</li><li><strong>Details</strong>: Prepare the map-ready country/year/index payload in the shared adapter and connect the Overview map to Flourish. Keep Flourish embedding or publication configuration separate from data normalization and do not place provider calls inside UI code. Define the expected country identifier, score, label, year, and no-data fields.</li><li><strong>Test Scenarios</strong>: selected year and index selection produce the expected map payload; countries with no selected-year score are omitted; map boundary configuration is reproducible.</li><li><strong>Tests</strong>: map-payload unit tests and Overview smoke test with a deterministic Flourish configuration fixture.</li><li><strong>Acceptance criteria</strong>: the Overview uses Flourish for the map and the integration can be updated without rewriting the adapter or other charts.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0050" data-source-block="block-0050" data-source-lines="165-165"><h3 id="7-implement-non-map-overview-visualizations-in-r">7. Implement non-map Overview visualizations in R</h3></div>
+<div class="source-block" id="render-owner-0052" data-source-block="block-0052" data-source-lines="167-178"><ul><li><strong>Requirements</strong>: R8, R9</li><li><strong>Files</strong>: <code>R/mod_overview_summary.R</code>, adapted <code>viz_functions/</code> helpers</li><li><strong>Details</strong>: Implement the mockup&#x27;s score distribution, average SPI by region, and average SPI by income group using R-based visualization functions. Use normalized data and explicit missing-value handling. Preserve consistent World Bank styling while avoiding global data objects.</li><li><strong>Test Scenarios</strong>: charts render for a valid year; empty subsets return a controlled empty state; partial scores do not silently become zeros.</li><li><strong>Tests</strong>: plot-data unit tests, <code>shiny::testServer()</code> output tests, and a local app smoke test.</li><li><strong>Acceptance criteria</strong>: all non-map Overview visualizations render from the shared reactive data interface.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0054" data-source-block="block-0054" data-source-lines="180-180"><h2 id="phase-3-validation-and-handoff">Phase 3: Validation and Handoff</h2></div>
+<div class="source-block source-heading" id="render-owner-0056" data-source-block="block-0056" data-source-lines="182-182"><h3 id="8-add-milestone-level-tests-documentation-and-reproducibility-checks">8. Add milestone-level tests, documentation, and reproducibility checks</h3></div>
+<div class="source-block" id="render-owner-0058" data-source-block="block-0058" data-source-lines="184-196"><ul><li><strong>Requirements</strong>: R1, R2, R3, R5, R6, R7, R8, R9, R10</li><li><strong>Files</strong>: <code>tests/</code>, <code>README.md</code>, dependency lock/manifest, data-contract documentation</li><li><strong>Details</strong>: Document setup, dependency installation, local fallback behavior, app launch, Flourish configuration, data refresh expectations, and the normalized adapter contract. Add deterministic fixtures so tests do not need live network access. Include a short maintainer checklist for new years or upstream schema changes.</li><li><strong>Test Scenarios</strong>: clean-environment setup; offline fixture tests; live provider smoke test when dependencies are available.</li><li><strong>Tests</strong>: testthat suite, package/load check, and documented launch command.</li><li><strong>Acceptance criteria</strong>: another contributor can install dependencies, run tests, launch the Overview, and understand how to update the data boundary.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0060" data-source-block="block-0060" data-source-lines="198-198"><h3 id="9-run-the-final-milestone-1-acceptance-gate">9. Run the final Milestone 1 acceptance gate</h3></div>
+<div class="source-block" id="render-owner-0062" data-source-block="block-0062" data-source-lines="200-210"><ul><li><strong>Requirements</strong>: R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11</li><li><strong>Files</strong>: all Milestone 1 files; <code>.cg-docs/work-reports/</code> during execution</li><li><strong>Details</strong>: Run the complete safe validation surface, inspect the Overview at the supported launch path, verify that no later milestone was silently implemented, and record evidence for each completion-contract row.</li><li><strong>Test Scenarios</strong>: clean-session launch, selected-year update, missing and partial data behavior, aggregate summaries, and Flourish map payload.</li><li><strong>Tests</strong>: full <code>testthat</code> suite, package validation, and local Shiny smoke test.</li><li><strong>Acceptance criteria</strong>: all required verification items pass or are explicitly accepted as exceptions under the <code>ask</code> deviation policy.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0064" data-source-block="block-0064" data-source-lines="212-212"><h2 id="testing-strategy">Testing Strategy</h2></div>
+<div class="source-block" id="render-owner-0066" data-source-block="block-0066" data-source-lines="214-221"><ul><li>Use deterministic local fixtures for schema, missing-data, partial-coverage, and aggregate scenarios; do not make ordinary tests dependent on live GitHub or Flourish services.</li><li>Test the provider adapter separately from Shiny modules.</li><li>Use <code>shiny::testServer()</code> for shared reactive state and Overview server logic.</li><li>Use a lightweight app launch smoke test for UI wiring and dependency loading.</li><li>Run package-level checks after the golem foundation and again at the final acceptance gate.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0068" data-source-block="block-0068" data-source-lines="223-223"><h2 id="documentation-checklist">Documentation Checklist</h2></div>
+<div class="source-block" id="render-owner-0070" data-source-block="block-0070" data-source-lines="225-231"><ul><li><input type="checkbox" disabled> Project setup and dependency installation.</li><li><input type="checkbox" disabled> Local <code>spiR</code> fallback and CRAN transition behavior.</li><li><input type="checkbox" disabled> Normalized data contract and supported score fields.</li><li><input type="checkbox" disabled> Year filtering and missing/partial data behavior.</li><li><input type="checkbox" disabled> Flourish map configuration and expected payload.</li><li><input type="checkbox" disabled> Overview launch and validation commands.</li><li><input type="checkbox" disabled> Maintainer procedure for new years and upstream column changes.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0072" data-source-block="block-0072" data-source-lines="233-233"><h2 id="risks-mitigations">Risks &amp; Mitigations</h2></div>
+<div class="source-block" id="render-owner-0074" data-source-block="block-0074" data-source-lines="235-242"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">Risk</th><th scope="col">Mitigation</th></tr></thead><tbody><tr><td><code>shiny</code>/<code>golem</code> are not installed in the current R environment.</td><td>Make environment setup an explicit prerequisite and verify package versions before implementation.</td></tr><tr><td><code>spiR</code> column names evolve.</td><td>Centralize schema detection and normalization; cover aliases with fixtures.</td></tr><tr><td>Existing visualization helpers assume global objects or working-directory paths.</td><td>Wrap them behind module-owned inputs and replace path discovery with explicit resource resolution.</td></tr><tr><td>Flourish integration duplicates or bypasses the shared data contract.</td><td>Define and test a map-ready payload before connecting the embed/configuration.</td></tr><tr><td>Live network data makes tests flaky.</td><td>Use deterministic fixtures for ordinary tests and isolate optional live smoke checks.</td></tr><tr><td>The first milestone expands into later tabs.</td><td>Keep the seven-tab roadmap documented but enforce the Milestone 1 boundaries during implementation.</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0076" data-source-block="block-0076" data-source-lines="244-244"><h2 id="out-of-scope">Out of Scope</h2></div>
+<div class="source-block" id="render-owner-0078" data-source-block="block-0078" data-source-lines="246-251"><ul><li>Country Explorer, Country Profile, Compare Countries, Trends and Progress, Explore by Pillar, and Data and Downloads.</li><li>Custom weighting and later-tab-specific visualizations.</li><li>CSV, Excel, and Stata download workflows.</li><li>Authentication, multilingual support, and production deployment.</li><li>A wholesale copy of <code>InnovationHubDashboard</code>.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0080" data-source-block="block-0080" data-source-lines="253-253"><h2 id="completion-contract">Completion Contract</h2></div>
+<div class="source-block source-heading" id="render-owner-0082" data-source-block="block-0082" data-source-lines="255-255"><h3 id="outcome">Outcome</h3></div>
+<div class="source-block" id="render-owner-0084" data-source-block="block-0084" data-source-lines="257-260"><p>Milestone 1 leaves a valid golem application with a documented shared SPI data contract and a working English Overview vertical slice. The Overview uses a shared year-aware reactive flow, Flourish for the map, and R for non-map visualizations while remaining maintainable as <code>spiR</code> evolves.</p></div>
+<div class="source-block source-heading" id="render-owner-0086" data-source-block="block-0086" data-source-lines="262-262"><h3 id="verification-surface">Verification Surface</h3></div>
+<div class="source-block" id="render-owner-0088" data-source-block="block-0088" data-source-lines="264-274"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">ID</th><th scope="col">Phase</th><th scope="col">Evidence Required</th><th scope="col">Command/Artifact</th><th scope="col">Required</th></tr></thead><tbody><tr><td>V1</td><td>1</td><td>Golem structure loads from a clean R session.</td><td>Package/load check and golem launch smoke test</td><td>yes</td></tr><tr><td>V2</td><td>1</td><td>Dependencies and provider behavior are reproducible.</td><td><code>DESCRIPTION</code> plus dependency/provider tests</td><td>yes</td></tr><tr><td>V3</td><td>1</td><td>Adapter returns normalized index, metadata, aggregates, years, and indicators.</td><td>Focused <code>testthat</code> adapter tests</td><td>yes</td></tr><tr><td>V4</td><td>1</td><td>Missing-year countries are excluded while partial and limited group data remain.</td><td>Fixture-based data-contract tests</td><td>yes</td></tr><tr><td>V5</td><td>2</td><td>Overview renders in English with shared year and filter state.</td><td><code>shiny::testServer()</code> and app smoke test</td><td>yes</td></tr><tr><td>V6</td><td>2</td><td>Summary charts consume shared filtered data.</td><td>Overview server and plot-data tests</td><td>yes</td></tr><tr><td>V7</td><td>2</td><td>Flourish map receives a reproducible map-ready payload.</td><td>Map payload tests and Overview smoke test</td><td>yes</td></tr><tr><td>V8</td><td>3</td><td>Existing functions are organized behind reusable interfaces.</td><td>Structure review and source-loading test</td><td>yes</td></tr><tr><td>V9</td><td>final</td><td>Milestone acceptance checklist is complete.</td><td>Full tests, package validation, and documented launch</td><td>yes</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0090" data-source-block="block-0090" data-source-lines="276-276"><h3 id="constraints">Constraints</h3></div>
+<div class="source-block" id="render-owner-0092" data-source-block="block-0092" data-source-lines="278-286"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">ID</th><th scope="col">Phase</th><th scope="col">Constraint</th><th scope="col">Check</th></tr></thead><tbody><tr><td>C1</td><td>1</td><td>Work remains on <code>main</code>.</td><td><code>git branch --show-current</code></td></tr><tr><td>C2</td><td>1</td><td>Project artifacts and UI text are English.</td><td>Source/UI review</td></tr><tr><td>C3</td><td>1</td><td><code>spiR</code> is primary; local functions are fallback only.</td><td>Provider-selection tests</td></tr><tr><td>C4</td><td>1</td><td>Data preparation is separate from UI modules.</td><td>Adapter/module review</td></tr><tr><td>C5</td><td>2</td><td>Map uses Flourish and non-map charts use R.</td><td>Overview implementation review</td></tr><tr><td>C6</td><td>2</td><td>No auth or download formats are added.</td><td>Scope review</td></tr><tr><td>C7</td><td>1</td><td>Upstream schema changes are handled in the adapter.</td><td>Alias/schema fixture tests</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0094" data-source-block="block-0094" data-source-lines="288-288"><h3 id="boundaries">Boundaries</h3></div>
+<div class="source-block" id="render-owner-0096" data-source-block="block-0096" data-source-lines="290-293"><ul><li>Allowed: minimal golem foundation, adapter layer, Overview controls, Flourish map boundary, R summary charts, tests, and documentation.</li><li>Out of scope: later mockup tabs, downloads, custom weighting, authentication, multilingual support, and production deployment.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0098" data-source-block="block-0098" data-source-lines="295-295"><h3 id="iteration-policy">Iteration Policy</h3></div>
+<div class="source-block" id="render-owner-0100" data-source-block="block-0100" data-source-lines="297-302"><ol><li>Preserve Approach 2 and validate each phase before starting the next.</li><li>Prefer existing <code>spiR</code> APIs and repository patterns over new abstractions.</li><li>Update the adapter and tests before changing UI modules for upstream schema changes.</li><li>Pause for user approval before any architectural deviation.</li><li>Record all deviations and evidence in the execution report.</li></ol></div>
+<div class="source-block source-heading" id="render-owner-0102" data-source-block="block-0102" data-source-lines="304-304"><h3 id="blocked-stop-conditions">Blocked-Stop Conditions</h3></div>
+<div class="source-block" id="render-owner-0104" data-source-block="block-0104" data-source-lines="306-314"><ul><li>Required R dependencies cannot be installed or loaded.</li><li>Required <code>spiR</code> data interfaces are unavailable or incompatible.</li><li>Flourish cannot consume the defined map-ready payload without changing the approved architecture.</li><li>Required validation cannot run through a safe reproducible R environment.</li><li>A protected project boundary must be crossed.</li><li>A required deviation is discovered under <code>deviation-policy: ask</code> and approval is unavailable.</li><li>Required evidence would have to be marked passed from static inspection only.</li></ul></div>
+    </article>
+  </main>
+</div>
+<footer class="provenance" aria-labelledby="provenance-heading">
+  <div class="provenance-inner">
+    <h2 id="provenance-heading">Derived view provenance</h2>
+    <p>This HTML is regenerable. Canonical Markdown remains authoritative.</p>
+    <dl>
+      <dt>Source</dt><dd>.cg-docs/plans/2026-08-06-milestone-1-repository-overview.md</dd>
+      <dt>Source SHA-256</dt><dd><code>deb16b6b2a6628489a1444769bb9f98def93ae31fb00e845e16d4e7525d5222a</code></dd>
+      <dt>Output</dt><dd>.cg-docs/views/plans/2026-08-06-milestone-1-repository-overview.html</dd>
+      <dt>Document type</dt><dd>plan</dd>
+      <dt>Renderer</dt><dd>0.1.0</dd>
+      <dt>Theme</dt><dd>reference v1</dd>
+      <dt>Generated UTC</dt><dd>2026-08-06T18:27:46Z</dd>
+    </dl>
+  </div>
+</footer>
+</body>
+</html>
