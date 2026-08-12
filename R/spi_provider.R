@@ -29,9 +29,10 @@ spi_provider_snapshot <- function(
 ) {
   provider <- spi_provider_functions(preferred = preferred, root = root)
   index <- provider$index(year = year)
+  metadata_raw <- provider$metadata(year = year)
   if (isTRUE(load_details)) {
     indicators <- provider$indicators(year = year)
-    metadata <- provider$metadata(year = year)
+    metadata <- metadata_raw
   } else {
     indicators <- data.frame()
     metadata <- data.frame()
@@ -54,6 +55,11 @@ spi_provider_snapshot <- function(
     } else {
       data.frame()
     },
+    income_data = spi_normalize_income_data(
+      index,
+      metadata_raw,
+      year = year
+    ),
     metadata = if (isTRUE(load_details)) {
       spi_normalize_metadata(metadata)
     } else {

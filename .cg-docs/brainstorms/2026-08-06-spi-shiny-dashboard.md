@@ -39,12 +39,13 @@ the source of truth for this project.
 - The Overview map must use Flourish.
 - Non-map visualizations should use R-based visualization methods.
 - The application should use `spiR` as the primary data package when available.
-- A shared year selector and shared reactive data flow should support all tabs.
+- A shared reactive data flow should use the latest year with valid data for
+  the Overview; a functional year selector is deferred.
 - Countries without data for the selected year should not be displayed.
 - Countries with partial indicator coverage should be displayed using available
   data.
-- Regional and income-group aggregates should be displayed when observations
-  are limited, using the available observations.
+- Regional aggregates should use the available aggregate rows, while
+  income-group summaries should use the available country observations.
 - New years and changes in `spiR` column names should be accommodated through
   the data interface rather than hard-coded independently in each tab.
 - Downloads in CSV, Excel, and Stata formats are not required for the first
@@ -59,7 +60,7 @@ the source of truth for this project.
 - Organize the existing data and visualization functions.
 - Define stable shared data interfaces for the application modules.
 - Integrate `spiR`, with local functions available during the transition.
-- Implement the shared year selector and core Overview filters.
+- Implement the latest-year Overview and core filters.
 - Implement the Overview tab with the Flourish map and summary views.
 - Leave the repository reproducible, ordered, and easy to update.
 

@@ -1,8 +1,5 @@
 overview_ui <- function(id) {
-  ns <- shiny::NS(id)
-  shiny::tagList(
-    shiny::selectInput(ns("year"), "Year", choices = NULL)
-  )
+  shiny::tagList()
 }
 
 overview_server <- function(
@@ -15,19 +12,10 @@ overview_server <- function(
     })
     years <- shiny::reactive(overview_years(snapshot()))
 
-    shiny::observe({
-      available <- years()
-      shiny::updateSelectInput(
-        session,
-        "year",
-        choices = available,
-        selected = if (length(available) > 0L) max(available) else character()
-      )
-    })
-
     selected_year <- shiny::reactive({
-      value <- suppressWarnings(as.integer(input$year))
-      if (is.na(value)) years()[[1L]] else value
+      available <- years()
+      if (length(available) == 0L) return(NA_integer_)
+      max(available)
     })
 
     output$provider <- shiny::renderText({

@@ -53,15 +53,14 @@ available for their future milestones.
 | R1 | Establish a minimal golem application structure. | Brainstorm / Milestone 1 |
 | R2 | Keep data acquisition and normalization separate from Shiny UI modules. | Brainstorm decision |
 | R3 | Prefer `spiR` and retain local functions as an explicit temporary fallback. | Plan review decision |
-| R4 | Provide normalized index, indicator, country metadata, aggregate, and year interfaces. | Brainstorm and plan review |
-| R5 | Exclude countries with no data for the selected year. | User requirements |
+| R4 | Provide normalized index, indicator, country metadata, aggregate, and latest-year interfaces. | Brainstorm and plan review |
+| R5 | Exclude countries with no data for the latest year with valid data. | User requirements |
 | R6 | Preserve partial country coverage and groups with limited observations. | User requirements |
 | R7 | Handle new years and upstream column-name changes in one adapter/schema layer. | Brainstorm requirements |
-| R8 | Implement an English Overview with shared controls and R-based summaries. | Mockup / Milestone 1 |
+| R8 | Implement an English Overview that displays the latest year with valid data and R-based summaries. | User decision / Milestone 1 |
 | R9 | Retain the required Flourish map using the existing 2024 visualization. | User and plan review decisions |
 | R10 | Keep the app public without authentication and omit downloads. | User requirements |
 | R11 | Work directly on `main` without creating branches. | User decision |
-| R12 | Use official aggregate rows supplied by `spiR` for regional and income summaries. | Plan review decision |
 
 ## Phase 1: Foundation and Data Contract
 
@@ -94,7 +93,7 @@ available for their future milestones.
 
 ### 3. Implement the shared SPI provider and normalization adapter
 
-- **Requirements**: R2, R3, R4, R5, R6, R7, R12
+- **Requirements**: R2, R3, R4, R5, R6, R7
 - **Files**: `R/spi_provider.R`, `R/spi_adapter.R`, `tests/testthat/`
 - **Details**: Prefer `spiR::spi_index()`, `spiR::spi_data()`,
   `spiR::country_info()`, and `spiR::spi_aggregates()` when the package and
@@ -103,8 +102,8 @@ available for their future milestones.
   dimension, and indicator records, including indicator ID/label, pillar,
   dimension, country, year, scored value, optional raw value, missing values,
   and score scale. Expose both wide map/chart-ready data and a long analytical
-  indicator interface. Use official aggregate rows for regional and income
-  summaries rather than recomputing country averages.
+  indicator interface. Use official aggregate rows for regional summaries and
+  available country observations for income-group summaries.
 - **Test Scenarios**: provider selection; missing-year countries excluded;
   partial indicator rows preserved; limited groups preserved; upstream aliases
   normalized; official aggregate rows selected.
@@ -130,19 +129,22 @@ available for their future milestones.
 
 ## Phase 2: Overview Implementation
 
-### 5. Build shared Overview state and controls
+### 5. Build shared Overview state and latest-year display
 
 - **Requirements**: R4, R5, R6, R8
 - **Files**: `R/mod_overview.R`, shared UI/server modules, Overview tests
-- **Details**: Implement English Overview controls and shared reactive state.
-  Populate available years from the adapter. Use the selected year for R-based
-  summaries and preserve valid defaults. The Flourish map remains explicitly
-  fixed to 2024 in this milestone.
-- **Test Scenarios**: changing the year updates all R summaries; countries
-  without selected-year data disappear; limited group observations remain.
+- **Details**: Implement the English Overview with one shared reactive
+  snapshot and derive the latest year with valid index data from the adapter.
+  Do not add a functional year selector in this milestone. Use the latest year
+  for all R-based summaries and preserve the explicit fixed-2024 scope of the
+  Flourish map.
+- **Test Scenarios**: the latest year is derived from valid index data;
+  countries without latest-year data disappear; limited group observations
+  remain.
 - **Tests**: `shiny::testServer()` tests for state and filters.
-- **Acceptance criteria**: all R Overview outputs use one shared data snapshot,
-  while the map clearly identifies its fixed 2024 scope.
+- **Acceptance criteria**: all R Overview outputs use one shared data snapshot
+  and the latest valid year, while the map clearly identifies its fixed 2024
+  scope.
 
 ### 6. Integrate the existing Flourish 2024 map
 
@@ -163,26 +165,28 @@ available for their future milestones.
 
 ### 7. Implement the non-map Overview visualizations in R
 
-- **Requirements**: R4, R5, R6, R8, R12
+- **Requirements**: R4, R5, R6, R8
 - **Files**: `R/mod_overview_summary.R`, only the required Overview chart helpers
 - **Details**: Implement the mockup's score distribution, average SPI by region,
   and average SPI by income group using R. Use normalized country/index data
-  where appropriate and official `spiR` aggregate rows for group summaries.
+  where appropriate and preserve the available country observations for income
+  group summaries.
   Handle missing values explicitly and preserve World Bank styling without
   global data objects.
-- **Test Scenarios**: valid year charts render; empty subsets show a controlled
-  empty state; partial scores do not become zeros; official aggregate rows are
-  used for group summaries.
+- **Test Scenarios**: valid latest-year charts render; empty subsets show a
+  controlled empty state; partial scores do not become zeros; income summaries
+  use available country observations.
 - **Tests**: plot-data unit tests, `shiny::testServer()` output tests, and app
   smoke test.
 - **Acceptance criteria**: all non-map Overview charts render from the shared
-  reactive interface and the official aggregate source.
+  reactive interface; regional summaries use supplied aggregate rows and income
+  summaries use available country observations.
 
 ## Phase 3: Validation and Handoff
 
 ### 8. Add milestone tests, documentation, and reproducibility checks
 
-- **Requirements**: R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R12
+- **Requirements**: R1, R2, R3, R4, R5, R6, R7, R8, R9, R10
 - **Files**: `tests/`, `README.md`, dependency manifest, data-contract docs
 - **Details**: Document setup, dependency installation, provider fallback,
   adapter contract, 2024 Flourish configuration, Overview launch, test
@@ -196,7 +200,7 @@ available for their future milestones.
 
 ### 9. Run the final Milestone 1 acceptance gate
 
-- **Requirements**: R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12
+- **Requirements**: R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11
 - **Files**: all Milestone 1 files; `.cg-docs/work-reports/` during execution
 - **Details**: Run the complete validation surface, inspect the Overview at the
   documented launch path, verify the 2024 Flourish map, verify no later tab was
@@ -212,7 +216,7 @@ available for their future milestones.
 - Use deterministic local fixtures for provider, schema, missing-data,
   partial-coverage, and aggregate scenarios.
 - Test the provider adapter separately from Shiny modules.
-- Use `shiny::testServer()` for reactive state and Overview server logic.
+- Use `shiny::testServer()` for latest-year state and Overview server logic.
 - Test the Flourish 2024 payload independently from the embed layer.
 - Isolate optional live GitHub/Flourish checks from ordinary offline tests.
 - Run package-level checks after foundation work and at final acceptance.
@@ -222,7 +226,8 @@ available for their future milestones.
 - [ ] Setup and dependency installation.
 - [ ] `spiR` preferred-provider and local fallback behavior.
 - [ ] Normalized index and indicator data contract.
-- [ ] Official aggregate source and missing-data behavior.
+- [ ] Aggregate source and missing-data behavior, including the distinction
+  between official regional rows and country-derived income summaries.
 - [ ] Fixed 2024 Flourish map configuration and API-key handling.
 - [ ] Overview launch and validation commands.
 - [ ] Future procedure for dynamic Flourish years and upstream schema changes.

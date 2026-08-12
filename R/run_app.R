@@ -4,9 +4,12 @@
 #' @return A shiny application object.
 #' @export
 run_app <- function(...) {
-  shiny::shinyApp(
-    ui = app_ui(),
-    server = app_server,
-    ...
+  golem::with_golem_options(
+    shiny::shinyApp(
+      ui = app_ui(),
+      server = app_server,
+      ...
+    ),
+    golem_opts = list()
   )
 }

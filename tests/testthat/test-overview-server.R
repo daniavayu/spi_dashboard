@@ -27,7 +27,6 @@ testthat::test_that("overview server uses one shared selected year", {
     env$overview_server,
     args = list(snapshot_loader = function() snapshot),
     {
-      session$setInputs(year = 2024)
       testthat::expect_equal(output$provider, "Data provider: fixture")
       testthat::expect_equal(output$selected_year, "2024")
     }

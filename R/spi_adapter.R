@@ -47,6 +47,73 @@ spi_normalize_index <- function(data, year = NULL) {
   result
 }
 
+spi_normalize_income_data <- function(index_data, metadata_data, year = NULL) {
+  index_code_col <- spi_find_column(index_data, c("iso3c", "country_code"))
+  index_name_col <- spi_find_column(
+    index_data,
+    c("country", "country_name"),
+    required = FALSE
+  )
+  index_year_col <- spi_find_column(index_data, c("date", "year", "Year"))
+  score_col <- spi_find_column(index_data, c("SPI.INDEX", "spi_index", "score"))
+  metadata_code_col <- spi_find_column(
+    metadata_data,
+    c("iso3c", "country_code")
+  )
+  metadata_year_col <- spi_find_column(
+    metadata_data,
+    c("date", "year", "Year")
+  )
+  income_col <- spi_find_column(
+    metadata_data,
+    c("income_level", "income_group", "income_level_name"),
+    required = FALSE
+  )
+
+  if (is.null(income_col)) {
+    return(data.frame(
+      country_code = character(), country_name = character(),
+      year = integer(), income_group = character(), score = numeric(),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  result <- data.frame(
+    country_code = as.character(index_data[[index_code_col]]),
+    country_name = if (is.null(index_name_col)) {
+      as.character(index_data[[index_code_col]])
+    } else {
+      as.character(index_data[[index_name_col]])
+    },
+    year = spi_as_year(index_data[[index_year_col]]),
+    income_group = NA_character_,
+    score = suppressWarnings(as.numeric(index_data[[score_col]])),
+    stringsAsFactors = FALSE
+  )
+
+  metadata_key <- paste(
+    as.character(metadata_data[[metadata_code_col]]),
+    spi_as_year(metadata_data[[metadata_year_col]]),
+    sep = "_"
+  )
+  index_key <- paste(result$country_code, result$year, sep = "_")
+  result$income_group <- as.character(
+    metadata_data[[income_col]][match(index_key, metadata_key)]
+  )
+
+  if (!is.null(year)) {
+    result <- result[result$year %in% spi_as_year(year), , drop = FALSE]
+  }
+  result <- result[
+    !is.na(result$score) & nzchar(result$country_code) &
+      !is.na(result$income_group) & nzchar(result$income_group),
+    ,
+    drop = FALSE
+  ]
+  rownames(result) <- NULL
+  result
+}
+
 spi_normalize_indicators <- function(data) {
   country_code_col <- spi_find_column(data, c("iso3c", "country_code"))
   country_name_col <- spi_find_column(
@@ -156,7 +223,10 @@ spi_normalize_aggregates <- function(data, year = NULL) {
 
 spi_available_years <- function(index_data) {
   year_col <- if ("year" %in% names(index_data)) "year" else "date"
-  sort(unique(spi_as_year(index_data[[year_col]])))
+  score_col <- if ("score" %in% names(index_data)) "score" else "SPI.INDEX"
+  years <- spi_as_year(index_data[[year_col]])
+  scores <- suppressWarnings(as.numeric(index_data[[score_col]]))
+  sort(unique(years[!is.na(years) & !is.na(scores)]))
 }
 
 spi_provider_available <- function(provider = c("spiR", "local")) {

@@ -75,3 +75,16 @@ testthat::test_that("aggregate data is normalized to the application schema", {
   )
   testthat::expect_equal(result$score, 65)
 })
+
+testthat::test_that("available years require a valid overall SPI score", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  index <- data.frame(
+    year = c(2004L, 2016L, 2024L),
+    score = c(NA_real_, 60, 75)
+  )
+
+  testthat::expect_equal(
+    spi_available_years(index),
+    c(2016L, 2024L)
+  )
+})

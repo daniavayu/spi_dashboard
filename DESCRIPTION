@@ -10,12 +10,14 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports:
     golem,
-    shiny
+    shiny,
+    spiR
 Suggests:
     data.table,
     dplyr,
     jsonlite,
     pkgload,
-    spiR,
-    testthat
+    testthat,
+    yaml
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

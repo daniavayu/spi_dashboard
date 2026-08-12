@@ -32,3 +32,21 @@ testthat::test_that("overview preserves limited aggregate observations", {
   testthat::expect_equal(nrow(result), 1)
   testthat::expect_equal(result$group_code, "AFE")
 })
+
+testthat::test_that("overview reports the available year range", {
+  source(normalizePath(testthat::test_path("..", "..", "R", "overview_data.R")), local = TRUE)
+  snapshot <- list(years = c(2004L, 2010L, 2024L))
+
+  testthat::expect_equal(overview_year_range(snapshot), "2004 - 2024")
+  testthat::expect_equal(overview_year_span(snapshot), "20")
+})
+
+testthat::test_that("overview counts valid data years", {
+  root <- normalizePath(testthat::test_path("..", ".."))
+  env <- new.env(parent = globalenv())
+  sys.source(file.path(root, "R", "overview_data.R"), envir = env)
+
+  snapshot <- list(years = 2016:2024)
+
+  testthat::expect_equal(env$overview_year_count(snapshot), 9L)
+})

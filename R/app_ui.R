@@ -1,4 +1,4 @@
-app_ui <- function() {
+app_ui <- function(request = NULL) {
   shiny::fluidPage(
     shiny::tags$head(
       shiny::tags$title("SPI | Global Overview"),
@@ -22,7 +22,7 @@ app_ui <- function() {
           ".spi-controls label { color: #60788d; font-size: 11px; text-transform: uppercase; }",
           ".spi-controls select { border: 1px solid #c9d8e1; border-radius: 3px;",
           "height: 38px; background: white; font-weight: 700; color: #17324d; }",
-          ".spi-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;",
+          ".spi-kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;",
           "margin-bottom: 18px; }",
           ".spi-card { background: white; border: 1px solid #e0e8ed; border-radius: 7px;",
           "box-shadow: 0 2px 8px rgba(23,50,77,.05); }",
@@ -31,15 +31,20 @@ app_ui <- function() {
           "font-weight: 700; letter-spacing: .05em; }",
           ".spi-value { color: #17324d; font-size: 31px; font-weight: 700; margin: 8px 0 3px; }",
           ".spi-note { color: #27a36a; font-size: 11px; }",
-          ".spi-main-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(300px, .9fr);",
+          ".spi-main-grid { display: grid; grid-template-columns: minmax(0, 1fr);",
           "gap: 18px; margin-bottom: 18px; }",
           ".spi-bottom-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }",
           ".spi-panel { padding: 20px; min-height: 290px; }",
           ".spi-panel h3 { font-size: 16px; margin: 0 0 3px; color: #17324d; }",
           ".spi-panel p { color: #7890a0; font-size: 11px; margin: 0 0 15px; }",
-          ".spi-map { min-height: 310px; background: #e3f2f8; border-radius: 4px;",
+          ".spi-variation { margin-top: 16px; padding-top: 16px;",
+          "border-top: 1px solid #d8e3e9; color: #7890a0; font-size: 11px; }",
+          ".spi-variation-title { color: #60788d; font-size: 12px;",
+          "margin-bottom: 8px; }",
+          ".spi-map-panel { padding: 20px; margin-bottom: 18px; }",
+          ".spi-map { min-height: 520px; background: #e3f2f8; border-radius: 4px;",
           "overflow: hidden; }",
-          ".spi-map iframe { display: block; width: 100%; height: 310px; border: 0; }",
+          ".spi-map iframe { display: block; width: 100%; height: 520px; border: 0; }",
           ".spi-chart { width: 100%; height: 245px; }",
           ".spi-footer { margin-top: 24px; color: #7890a0; font-size: 11px; }",
           ".spi-tabs { border: 0; margin-top: 8px; }",
@@ -70,20 +75,24 @@ app_ui <- function() {
           shiny::div(class = "spi-kicker", "SPI dashboard"),
           shiny::h1(class = "spi-title", "Global Overview"),
           shiny::p(class = "spi-intro", "How well are national statistical systems performing worldwide? Explore SPI scores across economies and over time."),
-          shiny::div(class = "spi-controls", overview_ui("overview")),
           shiny::div(class = "spi-kpis",
         shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Countries covered"), shiny::div(class = "spi-value", shiny::textOutput("kpi_countries", inline = TRUE)), shiny::div(class = "spi-note", "All available economies")),
-        shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Years of data"), shiny::div(class = "spi-value", shiny::textOutput("kpi_years", inline = TRUE)), shiny::div(class = "spi-note", "2004 - 2024 time series")),
-        shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Global average score"), shiny::div(class = "spi-value", shiny::textOutput("kpi_average", inline = TRUE)), shiny::div(class = "spi-note", "Selected year")),
-        shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Median improvement"), shiny::div(class = "spi-value", shiny::textOutput("kpi_change", inline = TRUE)), shiny::div(class = "spi-note", "Compared with 2016"))
+        shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Latest data year"), shiny::div(class = "spi-value", shiny::textOutput("kpi_years", inline = TRUE)), shiny::div(class = "spi-note", "Most recent valid SPI data")),
+        shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Global average score"), shiny::div(class = "spi-value", shiny::textOutput("kpi_average", inline = TRUE)), shiny::div(class = "spi-note", "Latest available year")),
+          shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Years with valid data"), shiny::div(class = "spi-value", shiny::textOutput("kpi_year_count", inline = TRUE)), shiny::div(class = "spi-note", shiny::textOutput("kpi_year_range", inline = TRUE))),
+          shiny::div(class = "spi-card spi-kpi", shiny::div(class = "spi-label", "Median improvement since 2016"), shiny::div(class = "spi-value", shiny::textOutput("kpi_improvement", inline = TRUE)), shiny::div(class = "spi-note", "Points gained (median country)"))
+          ),
+          shiny::div(class = "spi-card spi-map-panel",
+            shiny::h3("SPI Scores by Country"),
+            shiny::p("Global SPI scores for the latest available year."),
+            shiny::div(class = "spi-map", shiny::uiOutput("overview_flourish_map"))
           ),
           shiny::div(class = "spi-main-grid",
-        shiny::div(class = "spi-card spi-panel", shiny::h3("SPI Scores by Country"), shiny::p("Select a country on the map to explore its full profile."), shiny::div(class = "spi-map", shiny::uiOutput("overview_flourish_map"))),
         shiny::div(class = "spi-card spi-panel", shiny::h3("Score Distribution"), shiny::p("Countries grouped by SPI score."), shiny::plotOutput("overview_distribution", height = "235px"))
           ),
           shiny::div(class = "spi-bottom-grid",
-        shiny::div(class = "spi-card spi-panel", shiny::h3("Average SPI by Region"), shiny::p("Official aggregate scores for the selected year."), shiny::plotOutput("overview_regions", height = "220px")),
-        shiny::div(class = "spi-card spi-panel", shiny::h3("Average SPI by Income Group"), shiny::p("Official aggregate scores for the selected year."), shiny::plotOutput("overview_groups", height = "220px"))
+        shiny::div(class = "spi-card spi-panel", shiny::h3("Average SPI by Region"), shiny::p("Official aggregate scores for the latest available year."), shiny::plotOutput("overview_regions", height = "220px")),
+        shiny::div(class = "spi-card spi-panel", shiny::h3("Average SPI by Income Group"), shiny::p("Country-level averages for the latest available year."), shiny::plotOutput("overview_groups", height = "220px"), shiny::div(class = "spi-variation", shiny::div(class = "spi-variation-title", "Within-group variation (IQR)"), shiny::textOutput("overview_income_variation", inline = FALSE)))
           ),
           shiny::div(class = "spi-footer", "Source: World Bank Statistical Performance Indicators (SPI). Data provider: ", shiny::textOutput("footer_provider", inline = TRUE))
         ),
@@ -97,8 +106,7 @@ app_ui <- function() {
           shiny::div(class = "spi-placeholder", shiny::div(shiny::h2("Compare Countries"), shiny::p("Country comparison tools will be available in a future iteration.")))
         ),
         shiny::tabPanel("Trends & Progress",
-          shiny::div(class = "spi-placeholder", shiny::div(shiny::h2("Trends & Progress"), shiny::p("Longitudinal SPI analysis will be available in a future iteration.")))
-        ),
+          shiny::div(class = "spi-card spi-panel", shiny::h2("Trends & Progress"), shiny::p("Regional trends from the official spiR visualization functions."), shiny::plotOutput("overview_region_history", height = "520px"))),
         shiny::tabPanel("Explore by Pillar",
           shiny::div(class = "spi-placeholder", shiny::div(shiny::h2("Explore by Pillar"), shiny::p("Pillar and dimension exploration will be available in a future iteration.")))
         ),

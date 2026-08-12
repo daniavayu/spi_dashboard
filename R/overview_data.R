@@ -26,3 +26,23 @@ overview_years <- function(snapshot) {
   }
   as.integer(years[!is.na(years)])
 }
+
+overview_year_range <- function(snapshot) {
+  years <- overview_years(snapshot)
+  if (!length(years)) {
+    return("-")
+  }
+  paste(min(years), max(years), sep = " - ")
+}
+
+overview_year_span <- function(snapshot) {
+  years <- overview_years(snapshot)
+  if (length(years) < 2L) {
+    return("-")
+  }
+  as.character(max(years) - min(years))
+}
+
+overview_year_count <- function(snapshot) {
+  length(overview_years(snapshot))
+}

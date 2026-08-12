@@ -1,0 +1,217 @@
+{
+  "edge_count": 0,
+  "edges": [],
+  "entities": [
+    {
+      "date": "2026-08-06",
+      "entity_type": "brainstorm",
+      "path": ".cg-docs/brainstorms/2026-08-06-spi-shiny-dashboard.md",
+      "slug": "2026-08-06-spi-shiny-dashboard",
+      "status": "decided",
+      "summary": "The current Statistical Performance Indicators (SPI) webpage is a useful first point of access, but the project needs a simpler and clearer public experience for exploring the SPI index. The new dashboard should also be easy to modify, reproduce, and update when new SPI years or package changes become available.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "dashboard",
+        "spiR",
+        "flourish",
+        "world-bank",
+        "r"
+      ],
+      "title": "SPI Shiny Dashboard Reconstruction",
+      "top_keywords": [
+        "spir",
+        "milestone",
+        "dashboard",
+        "approach",
+        "innovationhubdashboard",
+        "golem",
+        "spi",
+        "shiny",
+        "overview",
+        "structure"
+      ]
+    },
+    {
+      "date": "2026-08-12",
+      "entity_type": "brainstorm",
+      "path": ".cg-docs/brainstorms/2026-08-12-milestone-2-country-explorer.md",
+      "slug": "2026-08-12-milestone-2-country-explorer",
+      "status": "decided",
+      "summary": "Milestone 1 established the Golem-compatible SPI dashboard foundation, the provider and normalization boundary, and the public Overview tab. Milestone 2 adds the Country Explorer tab described in the initial dashboard brainstorm and refined using the supplied dashboard mockup.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-explorer",
+        "spiR",
+        "filters",
+        "table",
+        "pillars",
+        "dimensions",
+        "indicators"
+      ],
+      "title": "Milestone 2: Country Explorer",
+      "top_keywords": [
+        "country explorer",
+        "country profile",
+        "spir",
+        "app_server.r",
+        "app_ui.r",
+        "mod_country_explorer.r",
+        "country_explorer_data.r",
+        "country_explorer_helpers.r",
+        "r/spi_provider.r",
+        "r/spi_adapter.r"
+      ]
+    },
+    {
+      "date": "2026-08-06",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-06-milestone-1-repository-overview-refined.md",
+      "slug": "2026-08-06-milestone-1-repository-overview-refined",
+      "status": "active",
+      "summary": "Create a minimal, maintainable golem application foundation and implement the Overview vertical slice for the public SPI dashboard. The result will isolate data acquisition from Shiny modules, use `spiR` as the preferred provider with an explicit local fallback during the transition, and expose stable interfaces for later dashboard tabs.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "overview",
+        "spiR",
+        "flourish",
+        "r",
+        "refined"
+      ],
+      "title": "Milestone 1: Repository Setup and Global Overview (Refined)",
+      "top_keywords": [
+        "spir",
+        "test scenarios",
+        "app",
+        "overview",
+        "shiny::testserver()",
+        "golem",
+        "milestone",
+        "phase",
+        "functions/",
+        "viz_functions/"
+      ]
+    },
+    {
+      "date": "2026-08-06",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-06-milestone-1-repository-overview.md",
+      "slug": "2026-08-06-milestone-1-repository-overview",
+      "status": "active",
+      "summary": "Create a minimal, maintainable golem application foundation and implement the Overview vertical slice for the public SPI dashboard. The result must isolate data acquisition from Shiny modules, use `spiR` as the primary provider when available, preserve the local functions as a temporary fallback, and expose a stable data interface for later dashboard tabs.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "overview",
+        "spiR",
+        "flourish",
+        "r"
+      ],
+      "title": "Milestone 1: Repository Setup and Global Overview",
+      "top_keywords": [
+        "spir",
+        "test scenarios",
+        "overview",
+        "app",
+        "viz_functions/",
+        "shiny::testserver()",
+        "golem",
+        "implement",
+        "phase",
+        "testthat"
+      ]
+    },
+    {
+      "date": "2026-08-12",
+      "entity_type": "solution",
+      "path": ".cg-docs/solutions/bugs/2026-08-12-milestone-1-overview-implementation.md",
+      "slug": "2026-08-12-milestone-1-overview-implementation",
+      "status": "",
+      "summary": "Milestone 1 required a maintainable public Overview for the SPI dashboard. The app had to use R Shiny and Golem, prefer the `spiR` package while it was still changing in a separate repository, preserve a local fallback, provide a shared latest-year data flow, retain the existing Flourish 2024 map, and render non-map summaries in R. The repository also contained legacy functions and visualization scripts with implicit working-directory assumptions and direct data loading. Copying those scripts into Shiny modules would have coupled the UI to unstable upstream column names and made future SPI updates expensive.",
+      "tags": [
+        "milestone-1",
+        "overview",
+        "R",
+        "Shiny",
+        "golem",
+        "spiR",
+        "Flourish",
+        "provider-adapter",
+        "testing"
+      ],
+      "title": "Milestone 1 Overview implementation for the SPI Shiny dashboard",
+      "top_keywords": [
+        "spir",
+        "overview",
+        "r/spi_provider.r",
+        "r/spi_adapter.r",
+        "shiny",
+        "dev/run_dev.r",
+        "r/flourish_payload.r",
+        "r/overview_summary.r",
+        "spi_provider.r",
+        "spi_adapter.r"
+      ]
+    },
+    {
+      "date": "2026-08-12",
+      "entity_type": "solution",
+      "path": ".cg-docs/solutions/bugs/2026-08-12-spi-region-visualization.md",
+      "slug": "2026-08-12-spi-region-visualization",
+      "status": "",
+      "summary": "The `spi_dashboard` app used a local region summary for the Average SPI by Region panel. The panel included aggregate codes beyond the seven geographic regions used by `spiR`, and labels such as `Europe & Central Asia (excluding high income)` were clipped in the horizontal bar chart. Development also required using local, not-yet-merged functions from a separate `spiR` repository. Calling `golem::run_dev()` with its default dependency installation attempted to resolve the local package as a remote dependency.",
+      "tags": [
+        "R",
+        "Shiny",
+        "spiR",
+        "golem",
+        "regional-aggregates",
+        "visualization",
+        "package-development"
+      ],
+      "title": "Correct regional aggregates and visualization in the SPI dashboard",
+      "top_keywords": [
+        "spir",
+        "visualization",
+        "golem::run_dev()",
+        "world bank",
+        "central asia",
+        "dashboard",
+        "spi",
+        "regional",
+        "aggregates",
+        "correct"
+      ]
+    }
+  ],
+  "entity_count": 6,
+  "generated": "2026-08-12",
+  "schema_version": "0.2.0",
+  "topic_count": 1,
+  "topics": [
+    {
+      "entity_count": 6,
+      "entity_paths": [
+        ".cg-docs/brainstorms/2026-08-06-spi-shiny-dashboard.md",
+        ".cg-docs/brainstorms/2026-08-12-milestone-2-country-explorer.md",
+        ".cg-docs/plans/2026-08-06-milestone-1-repository-overview-refined.md",
+        ".cg-docs/plans/2026-08-06-milestone-1-repository-overview.md",
+        ".cg-docs/solutions/bugs/2026-08-12-milestone-1-overview-implementation.md",
+        ".cg-docs/solutions/bugs/2026-08-12-spi-region-visualization.md"
+      ],
+      "keywords": [
+        "spir",
+        "test scenarios",
+        "overview"
+      ],
+      "label": "Spir / Test Scenarios / Overview",
+      "slug": "spir-test-scenarios-overview"
+    }
+  ]
+}
