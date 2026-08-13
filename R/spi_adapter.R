@@ -13,6 +13,41 @@ spi_find_column <- function(data, aliases, required = TRUE) {
   NULL
 }
 
+spi_empty_index <- function() {
+  data.frame(
+    country_code = character(), country_name = character(),
+    year = integer(), score = numeric(),
+    stringsAsFactors = FALSE
+  )
+}
+
+spi_empty_indicators <- function() {
+  data.frame(
+    indicator_id = character(), indicator_label = character(),
+    pillar_id = character(), pillar_label = character(),
+    dimension_id = character(), dimension_label = character(),
+    country_code = character(), country_name = character(),
+    year = integer(), score = numeric(), raw_value = numeric(),
+    stringsAsFactors = FALSE
+  )
+}
+
+spi_empty_metadata <- function() {
+  data.frame(
+    country_code = character(), country_name = character(),
+    year = integer(), region = character(), income_group = character(),
+    stringsAsFactors = FALSE
+  )
+}
+
+spi_empty_aggregates <- function() {
+  data.frame(
+    group_code = character(), group_name = character(), year = integer(),
+    source_id = character(), score = numeric(),
+    stringsAsFactors = FALSE
+  )
+}
+
 spi_as_year <- function(value) {
   suppressWarnings(as.integer(as.character(value)))
 }
@@ -38,6 +73,25 @@ spi_normalize_index <- function(data, year = NULL) {
     score = suppressWarnings(as.numeric(data[[score_col]])),
     stringsAsFactors = FALSE
   )
+
+  pillar_cols <- grep("^SPI\\.INDEX\\.PIL[0-9]+$", names(data), value = TRUE)
+  for (column in pillar_cols) {
+    pillar_id <- sub("^SPI\\.INDEX\\.PIL", "", column)
+    result[[paste0("pillar_", pillar_id, "_score")]] <-
+      suppressWarnings(as.numeric(data[[column]]))
+  }
+
+  dimension_cols <- grep(
+    "^SPI\\.DIM[0-9]+\\.[0-9]+\\.INDEX$",
+    names(data),
+    value = TRUE
+  )
+  for (column in dimension_cols) {
+    dimension_id <- sub("^SPI\\.DIM", "", column)
+    dimension_id <- sub("\\.INDEX$", "", dimension_id)
+    result[[paste0("dimension_", gsub("\\.", "_", dimension_id), "_score")]] <-
+      suppressWarnings(as.numeric(data[[column]]))
+  }
 
   if (!is.null(year)) {
     result <- result[result$year %in% spi_as_year(year), , drop = FALSE]
@@ -115,6 +169,9 @@ spi_normalize_income_data <- function(index_data, metadata_data, year = NULL) {
 }
 
 spi_normalize_indicators <- function(data) {
+  if (!is.data.frame(data) || nrow(data) == 0L) {
+    return(spi_empty_indicators())
+  }
   country_code_col <- spi_find_column(data, c("iso3c", "country_code"))
   country_name_col <- spi_find_column(
     data,
@@ -124,12 +181,7 @@ spi_normalize_indicators <- function(data) {
   year_col <- spi_find_column(data, c("date", "year", "Year"))
   score_cols <- grep("^SPI\\.D[0-9]+\\.", names(data), value = TRUE)
   if (length(score_cols) == 0L) {
-    return(data.frame(
-      indicator_id = character(), indicator_label = character(),
-      pillar = character(), dimension = character(), country_code = character(),
-      country_name = character(), year = integer(), score = numeric(),
-      raw_value = numeric(), stringsAsFactors = FALSE
-    ))
+    return(spi_empty_indicators())
   }
 
   rows <- vector("list", length(score_cols) * nrow(data))
@@ -145,8 +197,10 @@ spi_normalize_indicators <- function(data) {
       rows[[position]] <- data.frame(
         indicator_id = indicator_id,
         indicator_label = indicator_id,
-        pillar = pillar,
-        dimension = dimension,
+        pillar_id = pillar,
+        pillar_label = ifelse(is.na(pillar), NA_character_, pillar),
+        dimension_id = dimension,
+        dimension_label = ifelse(is.na(dimension), NA_character_, dimension),
         country_code = as.character(data[[country_code_col]][[row]]),
         country_name = if (is.null(country_name_col)) {
           as.character(data[[country_code_col]][[row]])
@@ -175,6 +229,8 @@ spi_normalize_metadata <- function(data) {
     income_group = c("income_level", "income_group"),
     year = c("date", "year", "Year")
   )
+  spi_find_column(data, aliases$country_code)
+  spi_find_column(data, aliases$year)
   result <- data.frame(row.names = seq_len(nrow(data)))
   for (name in names(aliases)) {
     column <- spi_find_column(data, aliases[[name]], required = FALSE)

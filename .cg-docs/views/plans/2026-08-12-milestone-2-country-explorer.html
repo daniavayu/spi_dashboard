@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="artifact-source" content=".cg-docs/plans/2026-08-12-milestone-2-country-explorer.md">
+<meta name="artifact-source-sha256" content="507ffcc9229690f2bec6db6cb3f95f03a94f57e133bd49a82eac94395535e963">
+<meta name="publication-provenance-schema" content="2">
+<meta name="publication-output" content=".cg-docs/views/plans/2026-08-12-milestone-2-country-explorer.html">
+<meta name="publication-theme" content="reference">
+<meta name="artifact-renderer-version" content="0.1.0">
+<title>Milestone 2: Country Explorer · Compound GPID</title>
+<style>:root {
+  color-scheme: light;
+  --paper: #f6f5f0;
+  --surface: #ffffff;
+  --ink: #17212b;
+  --muted: #59636d;
+  --line: #c8cdd1;
+  --accent: #006b5f;
+  --accent-strong: #004d45;
+  --signal: #a63d21;
+  --code: #eef1f3;
+  --focus: #d43f00;
+  --measure: 78rem;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); color: var(--ink); scroll-behavior: smooth; }
+body { margin: 0; min-width: 20rem; }
+a { color: var(--accent-strong); text-underline-offset: .18em; }
+a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.skip-link { position: absolute; left: .75rem; top: -5rem; z-index: 10; background: var(--ink); color: white; padding: .6rem .8rem; }
+.skip-link:focus { top: .75rem; }
+.masthead { border-bottom: 1px solid var(--line); background: var(--surface); }
+.masthead-inner { max-width: var(--measure); margin: 0 auto; padding: 1.6rem clamp(1rem, 4vw, 3rem); }
+.eyebrow { margin: 0 0 .45rem; color: var(--accent-strong); font-size: .78rem; font-weight: 750; text-transform: uppercase; }
+h1, h2, h3, h4, h5, h6 { font-family: "Iowan Old Style", "Palatino Linotype", serif; line-height: 1.16; margin: 1.5em 0 .55em; overflow-wrap: anywhere; }
+h1 { margin: 0; font-size: 3.4rem; }
+.deck { max-width: 58rem; margin: .75rem 0 0; color: var(--muted); }
+.layout { max-width: var(--measure); margin: 0 auto; display: grid; grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); padding: 2rem clamp(1rem, 4vw, 3rem) 4rem; }
+.sidebar { align-self: start; position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; border-left: 4px solid var(--accent); padding-left: 1rem; }
+.sidebar h2 { font-family: inherit; font-size: .82rem; text-transform: uppercase; margin: 0 0 .7rem; }
+.sidebar ul { list-style: none; margin: 0; padding: 0; }
+.sidebar li + li { margin-top: .45rem; }
+main { min-width: 0; }
+.derived-panel { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1rem 0; margin: 0 0 1.5rem; }
+.derived-panel h2 { font-size: 1.3rem; margin: 0 0 .65rem; }
+.phase-list, .coverage-list { display: grid; gap: .55rem; padding-left: 1.25rem; }
+.source-block { min-width: 0; }
+.source-block > :first-child { margin-top: 0; }
+.source-heading { scroll-margin-top: 1rem; }
+p, li, td, th, code { overflow-wrap: anywhere; }
+pre { max-width: 100%; overflow: auto; padding: 1rem; background: var(--code); border-left: 4px solid var(--accent); white-space: pre; }
+code { font-family: "SFMono-Regular", Consolas, monospace; font-size: .88em; }
+:not(pre) > code { background: var(--code); padding: .08em .3em; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; margin: 1rem 0 1.5rem; }
+th, td { border: 1px solid var(--line); padding: .55rem .7rem; text-align: left; vertical-align: top; min-width: 8rem; }
+th { background: #e6ece9; }
+blockquote { margin: 1rem 0; padding: .2rem 0 .2rem 1rem; border-left: 4px solid var(--signal); color: var(--muted); }
+.raw-source { border: 1px solid var(--line); margin: 1rem 0; }
+.raw-source figcaption { padding: .45rem .7rem; background: #f0e9e5; font-weight: 700; }
+.raw-source pre { margin: 0; border: 0; }
+.provenance { border-top: 1px solid var(--line); background: var(--surface); }
+.provenance-inner { max-width: var(--measure); margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem); }
+.provenance dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .35rem 1rem; }
+.provenance dt { font-weight: 700; }
+.provenance dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 48rem) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; max-height: none; border-left: 0; border-bottom: 1px solid var(--line); padding: 0 0 1rem; }
+  h1 { font-size: 2.15rem; }
+  .provenance dl { grid-template-columns: 1fr; }
+  .provenance dd + dt { margin-top: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+@media print {
+  :root { --paper: #fff; --surface: #fff; --ink: #000; --muted: #222; }
+  @page { margin: 15mm; }
+  .skip-link, .sidebar { display: none; }
+  .layout { display: block; max-width: none; padding: 0; }
+  .masthead-inner, .provenance-inner { max-width: none; padding: 0; }
+  .masthead { border: 0; margin-bottom: 1rem; }
+  a { color: #000; text-decoration: underline; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: .8em; }
+  pre, table, blockquote, .raw-source { break-inside: avoid; }
+  thead { display: table-header-group; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  .provenance { margin-top: 1rem; }
+}</style>
+<script id="artifact-provenance" type="application/json">{"documentType":"plan","generatedAt":"2026-08-12T21:37:38Z","outputPath":".cg-docs/views/plans/2026-08-12-milestone-2-country-explorer.html","provenanceSchemaVersion":2,"rendererVersion":"0.1.0","sourcePath":".cg-docs/plans/2026-08-12-milestone-2-country-explorer.md","sourceSha256":"507ffcc9229690f2bec6db6cb3f95f03a94f57e133bd49a82eac94395535e963","themeName":"reference","themeVersion":1}</script>
+</head>
+<body data-artifact-kind="plan">
+<a class="skip-link" href="#main-content">Skip to artifact content</a>
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">Execution contract</p>
+    <h1>Milestone 2: Country Explorer</h1>
+    <p class="deck">A complete human view of the canonical Plan, including phases, requirements, verification, risks, and boundaries. <a href="../../plans/2026-08-12-milestone-2-country-explorer.md">Open canonical Markdown</a>.</p>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" aria-label="Artifact sections" data-derived="navigation">
+    <h2>On this page</h2>
+    <ul><li><a href="#objective">Outcome</a></li><li><a href="#phase-map">Phase map</a></li><li><a href="#1-confirm-the-spir-schema-and-extend-the-shared-adapter-if-necessary">Steps</a></li><li><a href="#requirement-coverage">Requirement coverage</a></li><li><a href="#verification-surface">Verification</a></li><li><a href="#risks-mitigations">Risks</a></li><li><a href="#out-of-scope">Boundaries</a></li><li><a href="#provenance-heading">Provenance</a></li></ul>
+  </nav>
+  <main id="main-content" tabindex="-1">
+    <section class="derived-panel" data-derived="phase-map" aria-labelledby="phase-map"><h2 id="phase-map">Phase map</h2><ol class="phase-list"><li><strong>Phase 1</strong> · Data Contract and Feature Logic</li><li><strong>Phase 2</strong> · Golem Module, Integration, and Handoff</li></ol></section><section class="derived-panel" data-derived="requirement-coverage" aria-labelledby="requirement-coverage"><h2 id="requirement-coverage">Requirement coverage</h2><ul class="coverage-list"><li><strong>R1</strong> → steps 3, 4, 5</li><li><strong>R2</strong> → steps 1, 5</li><li><strong>R3</strong> → steps 1, 2</li><li><strong>R4</strong> → steps 1, 2</li><li><strong>R5</strong> → steps 1, 2</li><li><strong>R6</strong> → steps 2, 3, 4, 5</li><li><strong>R7</strong> → steps 2, 3, 4, 5</li><li><strong>R8</strong> → steps 1, 2, 3, 5</li><li><strong>R9</strong> → steps 2, 3</li><li><strong>R10</strong> → steps 3, 5</li><li><strong>R11</strong> → steps 1, 2, 3, 5</li><li><strong>R12</strong> → steps 4, 5</li></ul></section>
+    <article aria-label="Canonical artifact content">
+      <div class="source-block source-heading" id="render-owner-0002" data-source-block="block-0002" data-source-lines="15-15"><h1 id="plan-milestone-2-country-explorer">Plan: Milestone 2: Country Explorer</h1></div>
+<div class="source-block source-heading" id="render-owner-0004" data-source-block="block-0004" data-source-lines="17-17"><h2 id="objective">Objective</h2></div>
+<div class="source-block" id="render-owner-0006" data-source-block="block-0006" data-source-lines="19-22"><p>Implement the Country Explorer tab as an independent Golem module. The tab will use <code>spiR</code> as the primary provider, retain the local fallback from Milestone 1, and present an interactive country table with Pillars as the predetermined view and Dimensions and Indicators as alternative views.</p></div>
+<div class="source-block" id="render-owner-0008" data-source-block="block-0008" data-source-lines="24-26"><p>The finished feature will let users filter by region, income level, country name, and year; inspect summary statistics; sort and search the table; and select one country as the future handoff to Country Profile.</p></div>
+<div class="source-block source-heading" id="render-owner-0010" data-source-block="block-0010" data-source-lines="28-28"><h2 id="context">Context</h2></div>
+<div class="source-block" id="render-owner-0012" data-source-block="block-0012" data-source-lines="30-33"><p>Milestone 1 established the provider and adapter boundary, normalized index, indicator, metadata, and aggregate objects, and a shared Overview year flow. Country Explorer is currently a placeholder tab in <code>R/app_ui.R</code> and has no feature module or table implementation.</p></div>
+<div class="source-block" id="render-owner-0014" data-source-block="block-0014" data-source-lines="35-38"><p>The approved brainstorm keeps the dashboard mockup&#x27;s table-centered layout but adds a <code>Pillars / Dimensions / Indicators</code> view selector. Pillars is the starting view. Dimensions may be narrowed by pillar, and Indicators should show one selected indicator at a time to keep the table readable.</p></div>
+<div class="source-block" id="render-owner-0016" data-source-block="block-0016" data-source-lines="40-43"><p><code>spiR</code> remains in a separate local repository during development. The feature must consume its functions through the dashboard provider boundary rather than modifying the <code>spiR</code> repository or interpreting upstream schemas in Shiny UI code.</p></div>
+<div class="source-block" id="render-owner-0018" data-source-block="block-0018" data-source-lines="45-47"><p>No <code>compound-gpid.md</code> or <code>compound-gpid.local.md</code> exists. This plan proceeds without project charter or local workflow configuration. Work remains on <code>main</code>, as selected during planning.</p></div>
+<div class="source-block source-heading" id="render-owner-0020" data-source-block="block-0020" data-source-lines="49-49"><h2 id="requirements">Requirements</h2></div>
+<div class="source-block" id="render-owner-0022" data-source-block="block-0022" data-source-lines="51-64"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Source</th></tr></thead><tbody><tr><td>R1</td><td>Add Country Explorer as an independent Golem module.</td><td>Country Explorer brainstorm</td></tr><tr><td>R2</td><td>Use <code>spiR</code> as the primary data source and preserve the local fallback.</td><td>Milestone 1 plan / brainstorm</td></tr><tr><td>R3</td><td>Use <code>spiR::spi_index()</code> for overall SPI and pillar/dimension data where supported.</td><td>Country Explorer brainstorm</td></tr><tr><td>R4</td><td>Use <code>spiR::spi_data()</code> for detailed indicator data.</td><td>Country Explorer brainstorm</td></tr><tr><td>R5</td><td>Use <code>spiR::country_info()</code> for country, region, and income metadata.</td><td>Country Explorer brainstorm</td></tr><tr><td>R6</td><td>Make Pillars the default view and support Dimensions and Indicators.</td><td>Country Explorer brainstorm</td></tr><tr><td>R7</td><td>Provide region, income-level, country-search, and year filters.</td><td>Approved scope adjustment</td></tr><tr><td>R8</td><td>Keep <code>Overall SPI</code> visible in every view and display missing values as <code>-</code>, never zero.</td><td>Country Explorer brainstorm</td></tr><tr><td>R9</td><td>Provide summary statistics for the visible countries and active metric.</td><td>Country Explorer brainstorm</td></tr><tr><td>R10</td><td>Support sorting, search, and single-row selection in the table.</td><td>Country Explorer brainstorm</td></tr><tr><td>R11</td><td>Preserve partial coverage and provide controlled empty states.</td><td>Milestone 1 data contract</td></tr><tr><td>R12</td><td>Keep Country Profile, Compare Countries, maps, downloads, and fragile/conflict filtering out of scope.</td><td>Approved scope boundaries</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0024" data-source-block="block-0024" data-source-lines="66-66"><h2 id="phase-1-data-contract-and-feature-logic">Phase 1: Data Contract and Feature Logic</h2></div>
+<div class="source-block source-heading" id="render-owner-0026" data-source-block="block-0026" data-source-lines="68-68"><h3 id="1-confirm-the-spir-schema-and-extend-the-shared-adapter-if-necessary">1. Confirm the <code>spiR</code> schema and extend the shared adapter if necessary</h3></div>
+<div class="source-block" id="render-owner-0028" data-source-block="block-0028" data-source-lines="70-84"><ul><li><strong>Requirements</strong>: R2, R3, R4, R5, R8, R11</li><li><strong>Files</strong>: <code>R/spi_adapter.R</code>, <code>R/spi_provider.R</code>, <code>tests/testthat/test-spi-adapter.R</code>, <code>tests/testthat/test-spi-provider.R</code> if needed</li><li><strong>Details</strong>: Confirm the current local <code>spiR</code> columns and identifiers for overall SPI, pillars, dimensions, indicators, country names, region, income level, year, and missing scores. Extend the adapter only for aliases or fields needed by Country Explorer. Preserve the normalized snapshot contract and the explicit local fallback. Do not add fragile/conflict fields or filters.</li><li><strong>Test Scenarios</strong>: <code>spiR</code> schema happy path; local fallback; missing score; partial indicator coverage; absent optional metadata; year filtering.</li><li><strong>Tests</strong>: Extend deterministic adapter/provider tests with fixtures for the Country Explorer fields.</li><li><strong>Acceptance criteria</strong>: Country Explorer can receive one normalized data object without calling provider functions from its UI module, and both the preferred provider and fallback remain testable.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0030" data-source-block="block-0030" data-source-lines="86-86"><h3 id="2-build-pure-country-explorer-data-and-view-helpers">2. Build pure Country Explorer data and view helpers</h3></div>
+<div class="source-block" id="render-owner-0032" data-source-block="block-0032" data-source-lines="88-103"><ul><li><strong>Requirements</strong>: R3, R4, R5, R6, R7, R8, R9, R11</li><li><strong>Files</strong>: <code>R/country_explorer_data.R</code>, <code>R/country_explorer_helpers.R</code>, <code>tests/testthat/test-country-explorer-data.R</code>, <code>tests/testthat/test-country-explorer-helpers.R</code></li><li><strong>Details</strong>: Create application-owned functions that combine normalized index, indicator, and metadata data. Implement filtering by region, income level, country search, and year. Implement view preparation for Pillars, Dimensions, and one selected Indicator. Keep <code>Overall SPI</code> in every output, retain <code>NA</code> for missing values, calculate average/median/standard deviation for the active metric, and calculate <code>Change</code> only when a valid prior-year observation exists. Return explicit empty data frames with stable columns when no rows match.</li><li><strong>Test Scenarios</strong>: each filter alone; combined filters; case-insensitive partial search; no results; missing scores; one country with partial indicators; no prior year; all three view modes.</li><li><strong>Tests</strong>: Pure helper tests using deterministic fixtures only.</li><li><strong>Acceptance criteria</strong>: Helpers are deterministic, independent of Shiny, and return stable table-ready data for all three views.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0034" data-source-block="block-0034" data-source-lines="105-105"><h2 id="phase-2-golem-module-integration-and-handoff">Phase 2: Golem Module, Integration, and Handoff</h2></div>
+<div class="source-block source-heading" id="render-owner-0036" data-source-block="block-0036" data-source-lines="107-107"><h3 id="3-implement-the-country-explorer-golem-module-and-table">3. Implement the Country Explorer Golem module and table</h3></div>
+<div class="source-block" id="render-owner-0038" data-source-block="block-0038" data-source-lines="109-123"><ul><li><strong>Requirements</strong>: R1, R6, R7, R8, R9, R10, R11</li><li><strong>Files</strong>: <code>R/mod_country_explorer.R</code>, <code>DESCRIPTION</code>, <code>NAMESPACE</code>, table-related tests</li><li><strong>Details</strong>: Implement <code>mod_country_explorer_ui()</code> and <code>mod_country_explorer_server()</code> using the project&#x27;s existing Golem module conventions. Add filters for region, income level, search, and year; a <code>Pillars / Dimensions / Indicators</code> selector; dependent pillar and dimension selectors; summary outputs; an interactive table with sorting and search; and single-row selection. Use the smallest compatible table dependency, expected to be <code>DT</code>, only after confirming installation compatibility. Keep <code>Overall SPI</code> visible and render missing values as <code>-</code>.</li><li><strong>Test Scenarios</strong>: default Pillars view; switching modes; dependent selectors; filter reactivity; empty result state; table row selection.</li><li><strong>Tests</strong>: <code>shiny::testServer()</code> module tests and a focused app smoke test.</li><li><strong>Acceptance criteria</strong>: The module renders in isolation with fixtures and supports the approved interaction contract without provider calls in the UI.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0040" data-source-block="block-0040" data-source-lines="125-125"><h3 id="4-register-the-module-and-reuse-shared-app-state">4. Register the module and reuse shared app state</h3></div>
+<div class="source-block" id="render-owner-0042" data-source-block="block-0042" data-source-lines="127-140"><ul><li><strong>Requirements</strong>: R1, R6, R7, R12</li><li><strong>Files</strong>: <code>R/app_ui.R</code>, <code>R/app_server.R</code>, <code>R/mod_overview.R</code> or a new shared state helper if required</li><li><strong>Details</strong>: Replace the Country Explorer placeholder with the module UI and register its server from the application server. Reuse the global year state established by Overview or extract that state into an application-owned shared reactive interface; do not create an incompatible second year model. Keep Country Profile and Compare Countries as placeholders. Do not add a map, downloads, multi-row selection, rankings, or fragile/conflict filtering.</li><li><strong>Test Scenarios</strong>: clean app launch; Overview remains functional; Country Explorer opens with Pillars selected; year changes propagate consistently; other placeholder tabs remain unchanged.</li><li><strong>Tests</strong>: Existing Overview tests, module smoke test, and full testthat suite.</li><li><strong>Acceptance criteria</strong>: Country Explorer is navigable in the running Golem app and does not regress Milestone 1 outputs.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0044" data-source-block="block-0044" data-source-lines="142-142"><h3 id="5-document-and-validate-the-milestone">5. Document and validate the milestone</h3></div>
+<div class="source-block" id="render-owner-0046" data-source-block="block-0046" data-source-lines="144-156"><ul><li><strong>Requirements</strong>: R1, R2, R6, R7, R8, R10, R11, R12</li><li><strong>Files</strong>: <code>README.md</code>, <code>tests/testthat/</code>, <code>.cg-docs/work-reports/</code> if an execution report is produced</li><li><strong>Details</strong>: Document local <code>spiR</code> loading, the Country Explorer views and filters, the table dependency, missing-data behavior, and the boundary with Country Profile and Compare Countries. Run deterministic tests and a local launch smoke test. Record any unresolved <code>spiR</code> schema or optional live-data limitation instead of silently inferring it.</li><li><strong>Test Scenarios</strong>: clean local launch; deterministic fixtures; local <code>spiR</code> checkout; fallback provider; zero-result filters; partial data.</li><li><strong>Tests</strong>: <code>Rscript --vanilla -e &quot;testthat::test_dir(&#x27;tests/testthat&#x27;)&quot;</code>, parse/diagnostic checks, and local Golem smoke test.</li><li><strong>Acceptance criteria</strong>: Another contributor can launch, use, test, and understand Country Explorer without reading provider implementation details.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0048" data-source-block="block-0048" data-source-lines="158-158"><h2 id="testing-strategy">Testing Strategy</h2></div>
+<div class="source-block" id="render-owner-0050" data-source-block="block-0050" data-source-lines="160-167"><ul><li>Test pure filter and view helpers with deterministic data frames.</li><li>Test provider and adapter behavior separately from Shiny.</li><li>Use <code>shiny::testServer()</code> for module inputs, reactive filters, view modes, summary outputs, and row selection.</li><li>Keep live <code>spiR</code> calls out of ordinary deterministic tests.</li><li>Run the full existing test suite after module integration.</li><li>Verify the table visually at desktop and narrow viewport sizes during the local smoke test.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0052" data-source-block="block-0052" data-source-lines="169-169"><h2 id="documentation-checklist">Documentation Checklist</h2></div>
+<div class="source-block" id="render-owner-0054" data-source-block="block-0054" data-source-lines="171-179"><ul><li><input type="checkbox" disabled> Country Explorer launch and navigation.</li><li><input type="checkbox" disabled> <code>spiR</code> preferred provider and local fallback.</li><li><input type="checkbox" disabled> Pillars, Dimensions, and Indicators view behavior.</li><li><input type="checkbox" disabled> Region, income-level, country-search, and year filters.</li><li><input type="checkbox" disabled> Missing values and empty-result behavior.</li><li><input type="checkbox" disabled> Table dependency and local setup.</li><li><input type="checkbox" disabled> Single-row selection as the future Country Profile handoff.</li><li><input type="checkbox" disabled> Explicit statement that fragile/conflict filtering is not part of this milestone.</li><li><input type="checkbox" disabled> Boundary with Country Profile and Compare Countries.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0056" data-source-block="block-0056" data-source-lines="181-181"><h2 id="risks-mitigations">Risks &amp; Mitigations</h2></div>
+<div class="source-block" id="render-owner-0058" data-source-block="block-0058" data-source-lines="183-192"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">Risk</th><th scope="col">Mitigation</th></tr></thead><tbody><tr><td>Local <code>spiR</code> schemas differ from the Milestone 1 adapter contract.</td><td>Confirm schemas first, extend aliases centrally, and add fixtures before module work.</td></tr><tr><td>Pillar, dimension, or indicator metadata is not exposed consistently.</td><td>Use stable identifiers from <code>spiR</code>; make unsupported dependent selectors return a controlled empty state.</td></tr><tr><td>No compatible interactive table dependency is installed.</td><td>Evaluate the smallest compatible dependency before editing <code>DESCRIPTION</code>; stop if it cannot be installed.</td></tr><tr><td>Table rendering becomes too wide on small screens.</td><td>Keep Indicators single-select, use responsive table options, and test narrow viewports.</td></tr><tr><td>Missing values are mistaken for zeroes.</td><td>Preserve <code>NA</code> through helpers and test display formatting explicitly.</td></tr><tr><td>Year state diverges between Overview and Country Explorer.</td><td>Reuse or extract one shared year reactive instead of creating a second source of truth.</td></tr><tr><td>Feature logic leaks into <code>app_server.R</code>.</td><td>Keep data, helpers, and module logic in dedicated files and test module isolation.</td></tr><tr><td>Scope expands into Country Profile or Compare Countries.</td><td>Keep single-row selection only and treat downstream views as placeholders.</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0060" data-source-block="block-0060" data-source-lines="194-194"><h2 id="out-of-scope">Out of Scope</h2></div>
+<div class="source-block" id="render-owner-0062" data-source-block="block-0062" data-source-lines="196-204"><ul><li>Fragile/conflict status and filtering.</li><li>Country Profile analysis.</li><li>Multi-country comparison or multi-row selection.</li><li>New maps or Flourish changes.</li><li>Downloads and exports.</li><li>Custom weighting.</li><li>Ranking claims.</li><li>Production deployment.</li><li>Changes to the separate <code>spiR</code> repository.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0064" data-source-block="block-0064" data-source-lines="206-206"><h2 id="completion-contract">Completion Contract</h2></div>
+<div class="source-block source-heading" id="render-owner-0066" data-source-block="block-0066" data-source-lines="208-208"><h3 id="outcome">Outcome</h3></div>
+<div class="source-block" id="render-owner-0068" data-source-block="block-0068" data-source-lines="210-215"><p>Country Explorer is a standalone Golem module with an interactive table, Pillars as the default view, Dimensions and Indicators as alternatives, and filters for region, income level, country search, and year. It uses the normalized <code>spiR</code> provider boundary, preserves the local fallback, displays missing values as <code>-</code>, and leaves Country Profile and Compare Countries out of scope.</p></div>
+<div class="source-block source-heading" id="render-owner-0070" data-source-block="block-0070" data-source-lines="217-217"><h3 id="verification-surface">Verification Surface</h3></div>
+<div class="source-block" id="render-owner-0072" data-source-block="block-0072" data-source-lines="219-228"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">ID</th><th scope="col">Evidence Required</th><th scope="col">Command/Artifact</th><th scope="col">Required</th></tr></thead><tbody><tr><td>V1</td><td>Module files parse and diagnostics are clear.</td><td><code>Rscript --vanilla -e &quot;parse(...)&quot;</code> plus editor diagnostics</td><td>yes</td></tr><tr><td>V2</td><td>Provider and adapter expose the Country Explorer contract.</td><td>Focused provider/adapter tests with fixtures</td><td>yes</td></tr><tr><td>V3</td><td>Filters and all three view modes return correct table data.</td><td><code>test-country-explorer-helpers.R</code> and <code>test-country-explorer-data.R</code></td><td>yes</td></tr><tr><td>V4</td><td>Missing values, partial coverage, and empty states are controlled.</td><td>Pure helper tests and module tests</td><td>yes</td></tr><tr><td>V5</td><td>Shiny module supports default view, dependent selectors, summary, and row selection.</td><td><code>shiny::testServer()</code> module test</td><td>yes</td></tr><tr><td>V6</td><td>Country Explorer is registered without regressing Overview.</td><td>App smoke test and existing Overview tests</td><td>yes</td></tr><tr><td>V7</td><td>Full deterministic suite passes.</td><td><code>Rscript --vanilla -e &quot;testthat::test_dir(&#x27;tests/testthat&#x27;)&quot;</code></td><td>yes</td></tr><tr><td>V8</td><td>Local two-repository development works.</td><td><code>devtools::load_all(spiR_path)</code> then <code>golem::run_dev(install_required_packages = FALSE)</code></td><td>yes</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0074" data-source-block="block-0074" data-source-lines="230-230"><h3 id="constraints">Constraints</h3></div>
+<div class="source-block" id="render-owner-0076" data-source-block="block-0076" data-source-lines="232-241"><div class="table-scroll" role="region" aria-label="Source table" tabindex="0"><table><thead><tr><th scope="col">ID</th><th scope="col">Constraint</th><th scope="col">Check</th></tr></thead><tbody><tr><td>C1</td><td>Follow Golem module structure.</td><td>Feature UI/server live in <code>mod_country_explorer.R</code>.</td></tr><tr><td>C2</td><td><code>spiR</code> is the primary provider.</td><td>Module consumes provider snapshot, not direct local data functions.</td></tr><tr><td>C3</td><td>Preserve local fallback.</td><td>Provider fallback test passes.</td></tr><tr><td>C4</td><td>Do not modify <code>spiR</code>.</td><td>Review changed-file list.</td></tr><tr><td>C5</td><td>Missing values never become zero.</td><td>Fixture assertions and rendered table checks.</td></tr><tr><td>C6</td><td>Stay on <code>main</code>; do not create a branch.</td><td><code>git branch --show-current</code>.</td></tr><tr><td>C7</td><td>Exclude fragile/conflict filtering.</td><td>No related input, helper, or requirement in implementation.</td></tr><tr><td>C8</td><td>Keep Country Profile and Compare Countries out of scope.</td><td>Placeholder tabs remain unchanged.</td></tr></tbody></table></div></div>
+<div class="source-block source-heading" id="render-owner-0078" data-source-block="block-0078" data-source-lines="243-243"><h3 id="boundaries">Boundaries</h3></div>
+<div class="source-block" id="render-owner-0080" data-source-block="block-0080" data-source-lines="245-250"><ul><li><strong>Allowed</strong>: Country Explorer module, adapter extensions required by its contract, table dependency, tests, documentation, and shared year-state extraction.</li><li><strong>Out of scope</strong>: fragile/conflict, Country Profile, Compare Countries, multi-selection, maps, downloads, rankings, weighting, production changes, and edits to <code>spiR</code>.</li></ul></div>
+<div class="source-block source-heading" id="render-owner-0082" data-source-block="block-0082" data-source-lines="252-252"><h3 id="iteration-policy">Iteration Policy</h3></div>
+<div class="source-block" id="render-owner-0084" data-source-block="block-0084" data-source-lines="254-261"><ol><li>Confirm the real <code>spiR</code> schema before choosing aliases or UI labels.</li><li>Repair provider/adapter or pure helpers before changing module rendering.</li><li>If the selected table dependency is unavailable, evaluate one compatible alternative and stop for a decision if both fail.</li><li>Keep unsupported metadata visible as unavailable rather than inferring it.</li><li>Run focused tests after each implementation slice, then the full suite.</li><li>Record any accepted deviation in the execution report instead of widening scope silently.</li></ol></div>
+<div class="source-block source-heading" id="render-owner-0086" data-source-block="block-0086" data-source-lines="263-263"><h3 id="blocked-stop-conditions">Blocked-Stop Conditions</h3></div>
+<div class="source-block" id="render-owner-0088" data-source-block="block-0088" data-source-lines="265-271"><ul><li>Neither <code>spiR</code> nor the local fallback can provide country-level data.</li><li>Stable pillar, dimension, or indicator identifiers cannot be established.</li><li>The table dependency cannot be installed or rendered with the project Shiny version.</li><li>The shared year state cannot be reused without breaking Milestone 1.</li><li>Existing Milestone 1 tests regress for reasons unrelated to the feature and cannot be isolated.</li></ul></div>
+    </article>
+  </main>
+</div>
+<footer class="provenance" aria-labelledby="provenance-heading">
+  <div class="provenance-inner">
+    <h2 id="provenance-heading">Derived view provenance</h2>
+    <p>This HTML is regenerable. Canonical Markdown remains authoritative.</p>
+    <dl>
+      <dt>Source</dt><dd>.cg-docs/plans/2026-08-12-milestone-2-country-explorer.md</dd>
+      <dt>Source SHA-256</dt><dd><code>507ffcc9229690f2bec6db6cb3f95f03a94f57e133bd49a82eac94395535e963</code></dd>
+      <dt>Output</dt><dd>.cg-docs/views/plans/2026-08-12-milestone-2-country-explorer.html</dd>
+      <dt>Document type</dt><dd>plan</dd>
+      <dt>Renderer</dt><dd>0.1.0</dd>
+      <dt>Theme</dt><dd>reference v1</dd>
+      <dt>Generated UTC</dt><dd>2026-08-12T21:37:38Z</dd>
+    </dl>
+  </div>
+</footer>
+</body>
+</html>

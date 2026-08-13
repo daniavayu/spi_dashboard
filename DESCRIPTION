@@ -9,6 +9,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports:
+    DT,
     golem,
     shiny,
     spiR

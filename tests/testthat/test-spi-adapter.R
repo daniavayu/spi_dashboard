@@ -88,3 +88,47 @@ testthat::test_that("available years require a valid overall SPI score", {
     c(2016L, 2024L)
   )
 })
+
+testthat::test_that("index normalization retains direct pillar and dimension scores", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  raw <- data.frame(
+    iso3c = "AAA",
+    date = 2024,
+    country = "Alpha",
+    SPI.INDEX = 80,
+    SPI.INDEX.PIL1 = 75,
+    SPI.DIM1.1.INDEX = 72,
+    check.names = FALSE
+  )
+
+  result <- spi_normalize_index(raw)
+
+  testthat::expect_equal(result$score, 80)
+  testthat::expect_equal(result$pillar_1_score, 75)
+  testthat::expect_equal(result$dimension_1_1_score, 72)
+})
+
+testthat::test_that("indicator normalization exposes stable pillar and dimension fields", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  raw <- data.frame(
+    iso3c = "AAA",
+    date = 2024,
+    country = "Alpha",
+    SPI.D1.1.TEST = 70,
+    RAW.D1.1.TEST = 7,
+    check.names = FALSE
+  )
+
+  result <- spi_normalize_indicators(raw)
+
+  testthat::expect_named(
+    result,
+    c(
+      "indicator_id", "indicator_label", "pillar_id", "pillar_label",
+      "dimension_id", "dimension_label", "country_code", "country_name",
+      "year", "score", "raw_value"
+    )
+  )
+  testthat::expect_equal(result$pillar_id, "D1")
+  testthat::expect_equal(result$dimension_id, "D1.1")
+})

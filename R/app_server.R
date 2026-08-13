@@ -1,5 +1,31 @@
-app_server <- function(input, output, session) {
-  overview <- overview_server("overview")
+app_server <- function(input, output, session, snapshot_loader = NULL) {
+  overview_loader <- if (is.null(snapshot_loader)) {
+    function() spi_provider_snapshot(
+      load_details = FALSE,
+      load_metadata = TRUE,
+      load_aggregates = TRUE
+    )
+  } else {
+    snapshot_loader
+  }
+  explorer_loader <- if (is.null(snapshot_loader)) {
+    function() spi_provider_snapshot(
+      load_details = FALSE,
+      load_metadata = TRUE,
+      load_aggregates = FALSE
+    )
+  } else {
+    snapshot_loader
+  }
+  overview <- overview_server(
+    "overview",
+    snapshot_loader = overview_loader
+  )
+  country_explorer_server(
+    "country_explorer",
+    snapshot_loader = explorer_loader,
+    active = function() identical(input$main_nav, "Country Explorer")
+  )
 
   output$overview_flourish_map <- shiny::renderUI({
     regions <- prepare_flourish_regions(overview$snapshot()$index)
