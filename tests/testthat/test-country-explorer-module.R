@@ -38,7 +38,7 @@ testthat::test_that("Country Explorer module keeps its own year and view state",
     args = list(snapshot_loader = function() snapshot),
     {
       testthat::expect_equal(output$explorer_selected_year, "2024")
-      testthat::expect_equal(output$explorer_average, "76.0")
+      testthat::expect_equal(output$explorer_average, "76.00")
       session$setInputs(explorer_year = "2023")
       testthat::expect_equal(output$explorer_selected_year, "2023")
       session$setInputs(explorer_view = "indicators")

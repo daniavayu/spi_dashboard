@@ -1,6 +1,6 @@
 # 🧠 Project Brain
 
-_Generated 2026-08-12 · 6 entities · 1 topics · 0 edges_
+_Generated 2026-08-20 · 10 entities · 1 topics · 1 edges_
 
 ## How to Use
 
@@ -13,12 +13,18 @@ _Generated 2026-08-12 · 6 entities · 1 topics · 0 edges_
 
 | # | Topic | Entities | File |
 |---|-------|----------|------|
-| 1 | [Spir / Test Scenarios / Overview](BRAIN-01.md#spir-test-scenarios-overview) | 6 | BRAIN-01.md |
+| 1 | [Spir / Country Explorer / Test Scenarios](BRAIN-01.md#spir-country-explorer-test-scenarios) | 10 | BRAIN-01.md |
 
 ## Entity Summary
 
 | Type | Count |
 |------|-------|
 | brainstorm | 2 |
-| plan | 2 |
-| solution | 2 |
+| plan | 5 |
+| solution | 3 |
+
+## Relationship Summary
+
+| Edge Type | Count |
+|-----------|-------|
+| references | 1 |

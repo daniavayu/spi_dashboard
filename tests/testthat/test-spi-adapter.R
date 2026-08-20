@@ -132,3 +132,25 @@ testthat::test_that("indicator normalization exposes stable pillar and dimension
   testthat::expect_equal(result$pillar_id, "D1")
   testthat::expect_equal(result$dimension_id, "D1.1")
 })
+
+testthat::test_that("indicator normalization scales across multiple indicator columns", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  raw <- data.frame(
+    iso3c = c("AAA", "BBB"),
+    date = c(2024, 2024),
+    country = c("Alpha", "Beta"),
+    SPI.D1.1.TEST = c(70, 80),
+    RAW.D1.1.TEST = c(7, 8),
+    SPI.D2.1.TEST = c(50, 60),
+    check.names = FALSE
+  )
+
+  result <- spi_normalize_indicators(raw)
+
+  testthat::expect_equal(nrow(result), 4L)
+  testthat::expect_equal(length(unique(result$indicator_id)), 2L)
+  testthat::expect_equal(
+    result$score[result$indicator_id == "SPI.D2.1.TEST"],
+    c(50, 60)
+  )
+})

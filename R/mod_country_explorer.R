@@ -13,10 +13,7 @@ country_explorer_ui <- function(id) {
       shiny::selectInput(ns("explorer_income"), "Income level", choices = ""),
       shiny::textInput(ns("explorer_country"), "Search country", value = "",
         placeholder = "Type country name..."),
-      shiny::conditionalPanel(
-        condition = sprintf("input['%s'] === 'indicators'", ns("explorer_view")),
-        shiny::selectInput(ns("explorer_indicator"), "Indicator", choices = "")
-      ),
+      shiny::uiOutput(ns("explorer_indicator_ui")),
       shiny::actionButton(ns("explorer_reset"), "Reset")
     ),
     shiny::div(
@@ -87,6 +84,15 @@ country_explorer_server <- function(
       }
       spi_available_years(index)
     })
+    indicator_choices <- shiny::reactive({
+      indicators <- snapshot_value()$indicators
+      if (!is.data.frame(indicators) || nrow(indicators) == 0L) {
+        return(character())
+      }
+      unique_rows <- indicators[!duplicated(indicators$indicator_id),
+        c("indicator_id", "indicator_label"), drop = FALSE]
+      stats::setNames(unique_rows$indicator_id, unique_rows$indicator_label)
+    })
 
     shiny::observeEvent(snapshot(), {
       years <- available_years()
@@ -107,15 +113,18 @@ country_explorer_server <- function(
         session, "explorer_income",
         choices = c("All income levels" = "", stats::setNames(incomes, incomes))
       )
-      indicators <- snapshot_value()$indicators
-      indicator_choices <- if (is.data.frame(indicators) &&
-        nrow(indicators) > 0L) {
-        unique(stats::setNames(indicators$indicator_id, indicators$indicator_label))
-      } else {
-        character()
+    })
+
+    output$explorer_indicator_ui <- shiny::renderUI({
+      if (!identical(input$explorer_view, "indicators")) {
+        return(NULL)
       }
-      shiny::updateSelectInput(
-        session, "explorer_indicator", choices = indicator_choices
+      choices <- indicator_choices()
+      shiny::selectInput(
+        session$ns("explorer_indicator"),
+        "Indicator",
+        choices = choices,
+        selected = if (length(choices) > 0L) choices[[1L]] else character()
       )
     })
 
@@ -166,15 +175,15 @@ country_explorer_server <- function(
     })
     output$explorer_average <- shiny::renderText({
       value <- summary()$average
-      if (is.na(value)) "-" else sprintf("%.1f", value)
+      if (is.na(value)) "-" else sprintf("%.2f", value)
     })
     output$explorer_median <- shiny::renderText({
       value <- summary()$median
-      if (is.na(value)) "-" else sprintf("%.1f", value)
+      if (is.na(value)) "-" else sprintf("%.2f", value)
     })
     output$explorer_sd <- shiny::renderText({
       value <- summary()$standard_deviation
-      if (is.na(value)) "-" else sprintf("%.1f", value)
+      if (is.na(value)) "-" else sprintf("%.2f", value)
     })
     output$explorer_status <- shiny::renderText({
       data <- view_data()$data
@@ -187,22 +196,7 @@ country_explorer_server <- function(
       }
       if (nrow(data) > 0L && input$explorer_view %in% c("pillars", "dimensions") &&
         all(c("metric_label", "metric_score") %in% names(data))) {
-        identity_columns <- c(
-          "country_code", "country_name", "year", "region", "income_group",
-          "overall_spi", "change"
-        )
-        identity_columns <- intersect(identity_columns, names(data))
-        metric_labels <- unique(data$metric_label)
-        wide_data <- data[!duplicated(data[identity_columns]), identity_columns,
-          drop = FALSE]
-        for (metric_label in metric_labels) {
-          values <- data$metric_score[data$metric_label == metric_label]
-          keys <- paste(data$country_code[data$metric_label == metric_label],
-            data$year[data$metric_label == metric_label], sep = "_")
-          wide_keys <- paste(wide_data$country_code, wide_data$year, sep = "_")
-          wide_data[[metric_label]] <- values[match(wide_keys, keys)]
-        }
-        data <- wide_data
+        data <- spi_explorer_widen_metrics(data)
       }
       display_names <- c(
         country_code = "Code",
@@ -214,7 +208,8 @@ country_explorer_server <- function(
         metric_id = "Metric",
         metric_label = "Indicator",
         metric_score = "Score",
-        change = "Change"
+        change_previous = "Change vs previous data year",
+        change_first = "Change vs first data year"
       )
       names(data) <- ifelse(
         names(data) %in% names(display_names),
@@ -230,9 +225,10 @@ country_explorer_server <- function(
         data,
         rownames = FALSE,
         selection = "single",
-        filter = "top",
+        filter = "none",
         class = "stripe hover compact",
         options = list(
+          dom = "ltip",
           pageLength = 10,
           scrollX = TRUE,
           columnDefs = list(list(
@@ -246,6 +242,11 @@ country_explorer_server <- function(
           ))
         )
       )
+      numeric_columns <- names(data)[vapply(data, is.numeric, logical(1L))]
+      numeric_columns <- setdiff(numeric_columns, "Year")
+      if (length(numeric_columns) > 0L) {
+        table <- DT::formatRound(table, columns = numeric_columns, digits = 2)
+      }
       if (length(score_columns) > 0L) {
         table <- DT::formatStyle(
           table, columns = score_columns,

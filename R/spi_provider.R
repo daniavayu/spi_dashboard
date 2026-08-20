@@ -70,6 +70,13 @@ spi_provider_normalize_optional <- function(call, normalizer, empty, ...) {
   )
 }
 
+spi_provider_timeout_seconds <- function(operation, fallback_seconds = 60) {
+  if (identical(operation, "indicators")) {
+    return(120)
+  }
+  return(fallback_seconds)
+}
+
 spi_provider_call <- function(provider, operation, year = NULL) {
   function_value <- provider[[operation]]
   if (!is.function(function_value)) {
@@ -86,7 +93,11 @@ spi_provider_call <- function(provider, operation, year = NULL) {
     length(previous_timeout) != 1L || is.na(previous_timeout)) {
     previous_timeout <- 60
   }
-  options(timeout = min(previous_timeout, 30))
+  timeout_seconds <- spi_provider_timeout_seconds(
+    operation,
+    fallback_seconds = previous_timeout
+  )
+  options(timeout = max(previous_timeout, timeout_seconds))
   on.exit(options(timeout = previous_timeout), add = TRUE)
   result <- tryCatch(
     function_value(year = year),

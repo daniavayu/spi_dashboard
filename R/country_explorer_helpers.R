@@ -59,11 +59,73 @@ spi_explorer_metric_rows <- function(base, metric_columns, prefix, label_prefix)
       metric_id = metric_id,
       metric_label = paste(label_prefix, metric_id),
       metric_score = suppressWarnings(as.numeric(base[[column]])),
-      change = NA_real_,
       stringsAsFactors = FALSE
     )
   }
   do.call(rbind, rows)
+}
+
+spi_explorer_attach_overall_changes <- function(snapshot, data) {
+  if (!is.data.frame(data) || nrow(data) == 0L) return(data)
+  index <- snapshot$index
+  if (!is.data.frame(index) || nrow(index) == 0L) return(data)
+  index_year <- suppressWarnings(as.integer(index$year))
+  data$change_previous <- NA_real_
+  data$change_first <- NA_real_
+  for (row_number in seq_len(nrow(data))) {
+    country_rows <- which(as.character(index$country_code) ==
+      as.character(data$country_code[[row_number]]) &
+      !is.na(index_year))
+    if (length(country_rows) == 0L) next
+    country_years <- index_year[country_rows]
+    country_scores <- suppressWarnings(as.numeric(index$score[country_rows]))
+    current_year <- data$year[[row_number]]
+    current_rows <- which(country_years == current_year)
+    if (length(current_rows) == 0L) next
+    current_score <- country_scores[current_rows[[1L]]]
+    valid_rows <- which(!is.na(country_scores))
+    if (length(valid_rows) == 0L) next
+    first_row <- valid_rows[which.min(country_years[valid_rows])]
+    previous_rows <- valid_rows[country_years[valid_rows] < current_year]
+    if (length(previous_rows) > 0L && !is.na(current_score)) {
+      previous_row <- previous_rows[which.max(country_years[previous_rows])]
+      if (!is.na(country_scores[previous_row])) {
+        data$change_previous[[row_number]] <-
+          current_score - country_scores[previous_row]
+      }
+    }
+    if (!is.na(current_score) && !is.na(country_scores[first_row])) {
+      data$change_first[[row_number]] <-
+        current_score - country_scores[first_row]
+    }
+  }
+  data
+}
+
+spi_explorer_widen_metrics <- function(data) {
+  if (!is.data.frame(data) || nrow(data) == 0L) {
+    return(data)
+  }
+  if (!all(c("metric_label", "metric_score") %in% names(data))) {
+    return(data)
+  }
+
+  identity_columns <- intersect(c(
+    "country_code", "country_name", "year", "region", "income_group",
+    "overall_spi", "change_previous", "change_first"
+  ), names(data))
+  row_key <- paste(data$country_code, data$year, sep = "_")
+  wide_data <- data[!duplicated(row_key), identity_columns, drop = FALSE]
+  wide_key <- paste(wide_data$country_code, wide_data$year, sep = "_")
+
+  for (metric_label in unique(data$metric_label)) {
+    metric_rows <- data[data$metric_label == metric_label, , drop = FALSE]
+    metric_key <- paste(metric_rows$country_code, metric_rows$year, sep = "_")
+    wide_data[[metric_label]] <- metric_rows$metric_score[match(wide_key, metric_key)]
+  }
+
+  rownames(wide_data) <- NULL
+  return(wide_data)
 }
 
 spi_explorer_view <- function(
@@ -84,6 +146,7 @@ spi_explorer_view <- function(
   if (view == "pillars") {
     columns <- grep("^pillar_[0-9]+_score$", names(base), value = TRUE)
     data <- spi_explorer_metric_rows(base, columns, "pillar_", "Pillar")
+    data <- spi_explorer_attach_overall_changes(snapshot, data)
   } else if (view == "dimensions") {
     columns <- grep("^dimension_[0-9]+_[0-9]+_score$", names(base), value = TRUE)
     data <- spi_explorer_metric_rows(base, columns, "dimension_", "Dimension")
@@ -111,22 +174,9 @@ spi_explorer_view <- function(
         metric_id = indicators$indicator_id,
         metric_label = indicators$indicator_label,
         metric_score = indicators$score,
-        change = NA_real_,
         stringsAsFactors = FALSE
       )
     }
-  }
-  if (nrow(data) > 0L && nrow(snapshot$index) > 0L) {
-    prior_year <- data$year - 1L
-    prior_key <- paste(data$country_code, prior_year, sep = "_")
-    index_key <- paste(snapshot$index$country_code, snapshot$index$year, sep = "_")
-    prior_row <- match(prior_key, index_key)
-    prior_score <- snapshot$index$score[prior_row]
-    data$change <- ifelse(
-      !is.na(data$metric_score) & !is.na(prior_score),
-      data$metric_score - prior_score,
-      NA_real_
-    )
   }
   rownames(data) <- NULL
   list(

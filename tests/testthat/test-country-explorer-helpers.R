@@ -69,6 +69,42 @@ testthat::test_that("Explorer views retain overall SPI and missing values", {
   testthat::expect_equal(indicators$data$metric_score, c(71, NA_real_))
 })
 
+testthat::test_that("Explorer dimensions widen to one row per country-year", {
+  source(testthat::test_path("..", "..", "R", "country_explorer_data.R"), local = TRUE)
+  source(testthat::test_path("..", "..", "R", "country_explorer_helpers.R"), local = TRUE)
+
+  snapshot <- list(
+    index = data.frame(
+      country_code = c("AAA", "AAA", "AAA"),
+      country_name = c("Alpha", "Alpha", "Alpha"),
+      year = c(2021L, 2023L, 2024L),
+      score = c(40, 60, 70),
+      pillar_1_score = c(41.1111, 65.1111, 72.1111),
+      dimension_1_1_score = c(61.1111, 71.1111, 81.1111),
+      dimension_1_2_score = c(62.2222, 72.2222, 82.2222),
+      stringsAsFactors = FALSE
+    ),
+    indicators = data.frame(),
+    metadata = data.frame(
+      country_code = "AAA",
+      country_name = "Alpha",
+      year = 2024L,
+      region = "Region A",
+      income_group = "HIC",
+      stringsAsFactors = FALSE
+    ),
+    operation_status = list()
+  )
+
+  pillars <- spi_explorer_view(snapshot, view = "pillars", year = 2024L)
+  wide <- spi_explorer_widen_metrics(pillars$data)
+
+  testthat::expect_equal(nrow(wide), 1L)
+  testthat::expect_equal(wide$change_previous, 10)
+  testthat::expect_equal(wide$change_first, 30)
+  testthat::expect_equal(wide[["Pillar 1"]], 72.1111)
+})
+
 testthat::test_that("Explorer summary reports mean median and standard deviation", {
   source(testthat::test_path("..", "..", "R", "country_explorer_helpers.R"), local = TRUE)
 

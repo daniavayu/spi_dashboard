@@ -10,7 +10,7 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
   }
   explorer_loader <- if (is.null(snapshot_loader)) {
     function() spi_provider_snapshot(
-      load_details = FALSE,
+      load_details = TRUE,
       load_metadata = TRUE,
       load_aggregates = FALSE
     )

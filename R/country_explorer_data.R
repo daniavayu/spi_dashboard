@@ -3,7 +3,8 @@ spi_explorer_empty_table <- function() {
     country_code = character(), country_name = character(),
     year = integer(), region = character(), income_group = character(),
     overall_spi = numeric(), metric_id = character(),
-    metric_label = character(), metric_score = numeric(), change = numeric(),
+    metric_label = character(), metric_score = numeric(),
+    change_previous = numeric(), change_first = numeric(),
     stringsAsFactors = FALSE
   )
 }

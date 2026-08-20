@@ -184,41 +184,52 @@ spi_normalize_indicators <- function(data) {
     return(spi_empty_indicators())
   }
 
-  rows <- vector("list", length(score_cols) * nrow(data))
-  position <- 0L
-  for (indicator_id in score_cols) {
-    raw_id <- sub("^SPI", "RAW", indicator_id)
-    raw_available <- raw_id %in% names(data)
-    parts <- strsplit(indicator_id, "\\.", fixed = FALSE)[[1L]]
-    pillar <- if (length(parts) >= 2L) parts[[2L]] else NA_character_
-    dimension <- if (length(parts) >= 3L) paste(parts[[2L]], parts[[3L]], sep = ".") else NA_character_
-    for (row in seq_len(nrow(data))) {
-      position <- position + 1L
-      rows[[position]] <- data.frame(
-        indicator_id = indicator_id,
-        indicator_label = indicator_id,
-        pillar_id = pillar,
-        pillar_label = ifelse(is.na(pillar), NA_character_, pillar),
-        dimension_id = dimension,
-        dimension_label = ifelse(is.na(dimension), NA_character_, dimension),
-        country_code = as.character(data[[country_code_col]][[row]]),
-        country_name = if (is.null(country_name_col)) {
-          as.character(data[[country_code_col]][[row]])
-        } else {
-          as.character(data[[country_name_col]][[row]])
-        },
-        year = spi_as_year(data[[year_col]][[row]]),
-        score = suppressWarnings(as.numeric(data[[indicator_id]][[row]])),
-        raw_value = if (raw_available) {
-          suppressWarnings(as.numeric(data[[raw_id]][[row]]))
-        } else {
-          NA_real_
-        },
-        stringsAsFactors = FALSE
-      )
+  row_count <- nrow(data)
+  indicator_count <- length(score_cols)
+  indicator_parts <- strsplit(score_cols, "\\.", fixed = FALSE)
+  pillar_ids <- vapply(indicator_parts, function(parts) {
+    if (length(parts) >= 2L) parts[[2L]] else NA_character_
+  }, character(1L))
+  dimension_ids <- vapply(indicator_parts, function(parts) {
+    if (length(parts) >= 3L) {
+      paste(parts[[2L]], parts[[3L]], sep = ".")
+    } else {
+      NA_character_
     }
-  }
-  do.call(rbind, rows[seq_len(position)])
+  }, character(1L))
+
+  score_values <- unlist(lapply(score_cols, function(column) {
+    suppressWarnings(as.numeric(data[[column]]))
+  }), use.names = FALSE)
+  raw_values <- unlist(lapply(score_cols, function(column) {
+    raw_column <- sub("^SPI", "RAW", column)
+    if (raw_column %in% names(data)) {
+      suppressWarnings(as.numeric(data[[raw_column]]))
+    } else {
+      rep(NA_real_, row_count)
+    }
+  }), use.names = FALSE)
+
+  result <- data.frame(
+    indicator_id = rep(score_cols, each = row_count),
+    indicator_label = rep(score_cols, each = row_count),
+    pillar_id = rep(pillar_ids, each = row_count),
+    pillar_label = rep(pillar_ids, each = row_count),
+    dimension_id = rep(dimension_ids, each = row_count),
+    dimension_label = rep(dimension_ids, each = row_count),
+    country_code = rep(as.character(data[[country_code_col]]), times = indicator_count),
+    country_name = rep(if (is.null(country_name_col)) {
+      as.character(data[[country_code_col]])
+    } else {
+      as.character(data[[country_name_col]])
+    }, times = indicator_count),
+    year = rep(spi_as_year(data[[year_col]]), times = indicator_count),
+    score = score_values,
+    raw_value = raw_values,
+    stringsAsFactors = FALSE
+  )
+  rownames(result) <- NULL
+  return(result)
 }
 
 spi_normalize_metadata <- function(data) {

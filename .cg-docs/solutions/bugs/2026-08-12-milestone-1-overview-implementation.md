@@ -146,6 +146,7 @@ Phase 1 of the refined Milestone 1 plan is complete. Phase 2 Overview implementa
 - `.cg-docs/plans/2026-08-06-milestone-1-repository-overview-refined.md`
 - `.cg-docs/work-reports/2026-08-06-milestone-1-repository-overview-refined.md`
 - `.cg-docs/solutions/bugs/2026-08-12-spi-region-visualization.md`
+- `.cg-docs/solutions/testing-patterns/2026-08-20-milestone-2-country-explorer.md`
 - `README.md`
 - `dev/run_dev.R`
 - `R/spi_provider.R`

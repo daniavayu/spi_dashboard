@@ -1,6 +1,13 @@
 {
-  "edge_count": 0,
-  "edges": [],
+  "edge_count": 1,
+  "edges": [
+    {
+      "edge_type": "references",
+      "source": ".cg-docs/brainstorms/2026-08-12-milestone-2-country-explorer.md",
+      "target": ".cg-docs/plans/2026-08-12-milestone-2-country-explorer.md",
+      "target_missing": false
+    }
+  ],
   "entities": [
     {
       "date": "2026-08-06",
@@ -129,6 +136,107 @@
     },
     {
       "date": "2026-08-12",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-12-milestone-2-country-explorer.md",
+      "slug": "2026-08-12-milestone-2-country-explorer",
+      "status": "active",
+      "summary": "Implement the Country Explorer tab as an independent Golem module. The tab will use `spiR` as the primary provider, retain the local fallback from Milestone 1, and present an interactive country table with Pillars as the predetermined view and Dimensions and Indicators as alternative views.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-explorer",
+        "spiR",
+        "filters",
+        "table",
+        "pillars",
+        "dimensions",
+        "indicators"
+      ],
+      "title": "Milestone 2: Country Explorer",
+      "top_keywords": [
+        "country explorer",
+        "spir",
+        "country profile",
+        "compare countries",
+        "test scenarios",
+        "country",
+        "explorer",
+        "module",
+        "overall spi",
+        "shiny::testserver()"
+      ]
+    },
+    {
+      "date": "2026-08-13",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-13-milestone-2-country-explorer-final.md",
+      "slug": "2026-08-13-milestone-2-country-explorer-final",
+      "status": "completed",
+      "summary": "Implement Country Explorer as an independent Golem module for browsing and filtering country-level SPI data. The module will provide Pillars as the default view and Dimensions and Indicators as alternatives, while keeping provider interpretation outside the Shiny UI layer.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-explorer",
+        "spiR",
+        "filters",
+        "table",
+        "pillars",
+        "dimensions",
+        "indicators",
+        "year-selector"
+      ],
+      "title": "Milestone 2: Country Explorer (Final Plan)",
+      "top_keywords": [
+        "country explorer",
+        "spir",
+        "fragile/conflict",
+        "spi_data()",
+        "country profile",
+        "test scenarios",
+        "test-spi-provider.r",
+        "imports",
+        "test-spi-adapter.r",
+        "na"
+      ]
+    },
+    {
+      "date": "2026-08-13",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-13-milestone-2-country-explorer-revised.md",
+      "slug": "2026-08-13-milestone-2-country-explorer-revised",
+      "status": "active",
+      "summary": "Implement Country Explorer as an independent Golem module for browsing and filtering country-level SPI data. The module will provide Pillars as the predetermined view and Dimensions and Indicators as alternative views, while keeping provider interpretation outside the Shiny UI layer.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-explorer",
+        "spiR",
+        "filters",
+        "table",
+        "pillars",
+        "dimensions",
+        "indicators",
+        "year-selector"
+      ],
+      "title": "Milestone 2: Country Explorer (Revised)",
+      "top_keywords": [
+        "country explorer",
+        "spir",
+        "spi_data()",
+        "fragile/conflict",
+        "country profile",
+        "dt",
+        "compare countries",
+        "test scenarios",
+        "country",
+        "explorer"
+      ]
+    },
+    {
+      "date": "2026-08-12",
       "entity_type": "solution",
       "path": ".cg-docs/solutions/bugs/2026-08-12-milestone-1-overview-implementation.md",
       "slug": "2026-08-12-milestone-1-overview-implementation",
@@ -188,30 +296,67 @@
         "aggregates",
         "correct"
       ]
+    },
+    {
+      "date": "2026-08-20",
+      "entity_type": "solution",
+      "path": ".cg-docs/solutions/testing-patterns/2026-08-20-milestone-2-country-explorer.md",
+      "slug": "2026-08-20-milestone-2-country-explorer",
+      "status": "",
+      "summary": "Milestone 2 added Country Explorer to the SPI Shiny dashboard. The feature needed to browse country-level data across years, support Pillars, Dimensions, and Indicators views, expose region, income, and country filters, and provide an interactive table with summaries and single-row selection. It also had to use `spiR` as the preferred provider, retain the local fallback, preserve missing values, and keep Country Explorer year selection independent from Overview. The provider operations can fail independently or return incomplete schemas. Loading a selected year directly from the provider would have coupled the UI to upstream behavior and made local tests dependent on live...",
+      "tags": [
+        "milestone-2",
+        "country-explorer",
+        "shiny",
+        "golem",
+        "spiR",
+        "provider-adapter",
+        "normalized-data",
+        "fixture-injection",
+        "DT",
+        "year-selector"
+      ],
+      "title": "Milestone 2 Country Explorer with a normalized all-years contract",
+      "top_keywords": [
+        "country explorer",
+        "spir",
+        "na",
+        "dt",
+        "r/spi_provider.r",
+        "r/spi_adapter.r",
+        "r/country_explorer_data.r",
+        "r/country_explorer_helpers.r",
+        "country",
+        "explorer"
+      ]
     }
   ],
-  "entity_count": 6,
-  "generated": "2026-08-12",
+  "entity_count": 10,
+  "generated": "2026-08-20",
   "schema_version": "0.2.0",
   "topic_count": 1,
   "topics": [
     {
-      "entity_count": 6,
+      "entity_count": 10,
       "entity_paths": [
         ".cg-docs/brainstorms/2026-08-06-spi-shiny-dashboard.md",
         ".cg-docs/brainstorms/2026-08-12-milestone-2-country-explorer.md",
         ".cg-docs/plans/2026-08-06-milestone-1-repository-overview-refined.md",
         ".cg-docs/plans/2026-08-06-milestone-1-repository-overview.md",
+        ".cg-docs/plans/2026-08-12-milestone-2-country-explorer.md",
+        ".cg-docs/plans/2026-08-13-milestone-2-country-explorer-final.md",
+        ".cg-docs/plans/2026-08-13-milestone-2-country-explorer-revised.md",
         ".cg-docs/solutions/bugs/2026-08-12-milestone-1-overview-implementation.md",
-        ".cg-docs/solutions/bugs/2026-08-12-spi-region-visualization.md"
+        ".cg-docs/solutions/bugs/2026-08-12-spi-region-visualization.md",
+        ".cg-docs/solutions/testing-patterns/2026-08-20-milestone-2-country-explorer.md"
       ],
       "keywords": [
         "spir",
-        "test scenarios",
-        "overview"
+        "country explorer",
+        "test scenarios"
       ],
-      "label": "Spir / Test Scenarios / Overview",
-      "slug": "spir-test-scenarios-overview"
+      "label": "Spir / Country Explorer / Test Scenarios",
+      "slug": "spir-country-explorer-test-scenarios"
     }
   ]
 }
