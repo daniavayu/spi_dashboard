@@ -14,6 +14,7 @@ country_explorer_ui <- function(id) {
       shiny::textInput(ns("explorer_country"), "Search country", value = "",
         placeholder = "Type country name..."),
       shiny::uiOutput(ns("explorer_indicator_ui")),
+      shiny::actionButton(ns("explorer_compare"), "Compare Selected"),
       shiny::actionButton(ns("explorer_reset"), "Reset")
     ),
     shiny::div(
@@ -33,10 +34,13 @@ country_explorer_ui <- function(id) {
 country_explorer_server <- function(
   id,
   snapshot_loader = function() spi_provider_snapshot(load_details = TRUE),
-  active = function() TRUE
+  active = function() TRUE,
+  on_compare = function(countries) invisible(NULL)
 ) {
   shiny::moduleServer(id, function(input, output, session) {
     snapshot <- shiny::reactiveVal(NULL)
+  selected_countries <- shiny::reactiveVal(character())
+    selected_country_input <- session$ns("explorer_selected_country")
     shiny::observeEvent(active(), {
       if (isTRUE(active()) && is.null(snapshot())) {
         snapshot(tryCatch(
@@ -129,6 +133,7 @@ country_explorer_server <- function(
     })
 
     shiny::observeEvent(input$explorer_reset, {
+      selected_countries(character())
       years <- available_years()
       shiny::updateSelectInput(
         session, "explorer_year",
@@ -187,17 +192,35 @@ country_explorer_server <- function(
     })
     output$explorer_status <- shiny::renderText({
       data <- view_data()$data
+      operation <- snapshot_value()$operation_status$index
+      if (!is.null(operation) && identical(operation$status, "error")) {
+        return(paste("Data could not be loaded:", operation$error))
+      }
       if (nrow(data) == 0L) "No data available for the selected filters" else ""
     })
     output$explorer_table <- DT::renderDT({
       data <- view_data()$data
+      selected_view <- if (is.null(input$explorer_view)) {
+        "pillars"
+      } else {
+        input$explorer_view
+      }
       if (nrow(data) == 0L) {
         data <- spi_explorer_empty_table()[0, , drop = FALSE]
       }
-      if (nrow(data) > 0L && input$explorer_view %in% c("pillars", "dimensions") &&
+      if (nrow(data) > 0L && selected_view %in% c("pillars", "dimensions") &&
         all(c("metric_label", "metric_score") %in% names(data))) {
         data <- spi_explorer_widen_metrics(data)
       }
+      data$Select <- paste0(
+        '<input type="checkbox" class="spi-country-select" ',
+        'data-country-code="', data$country_code, '" ',
+        "onchange=\"Shiny.setInputValue('", selected_country_input,
+        "', this.dataset.countryCode + '|' + ",
+        "(this.checked ? '1' : '0'), {priority: 'event'})\" ",
+        'aria-label="Select country" />'
+      )
+      data <- data[, c("Select", setdiff(names(data), "Select")), drop = FALSE]
       display_names <- c(
         country_code = "Code",
         country_name = "Country",
@@ -224,13 +247,15 @@ country_explorer_server <- function(
       table <- DT::datatable(
         data,
         rownames = FALSE,
-        selection = "single",
+        selection = list(mode = "multiple", target = "row"),
+        escape = FALSE,
         filter = "none",
         class = "stripe hover compact",
         options = list(
           dom = "ltip",
           pageLength = 10,
           scrollX = TRUE,
+          select = list(style = "multi", selector = "td:first-child"),
           columnDefs = list(list(
             targets = "_all",
             render = DT::JS(
@@ -239,7 +264,7 @@ country_explorer_server <- function(
               "return data;",
               "}"
             )
-          ))
+          ), list(targets = 0, orderable = FALSE))
         )
       )
       numeric_columns <- names(data)[vapply(data, is.numeric, logical(1L))]
@@ -262,6 +287,35 @@ country_explorer_server <- function(
         )
       }
       table
+    }, server = FALSE)
+
+    shiny::observeEvent(input$explorer_selected_country, {
+      if (is.null(input$explorer_selected_country)) return()
+      change <- strsplit(as.character(input$explorer_selected_country),
+        "|", fixed = TRUE)[[1L]]
+      if (length(change) != 2L || !nzchar(change[[1L]])) return()
+      selected <- selected_countries()
+      if (identical(change[[2L]], "1")) {
+        selected <- unique(c(selected, change[[1L]]))
+      } else {
+        selected <- setdiff(selected, change[[1L]])
+      }
+      selected_countries(selected)
+    })
+
+    shiny::observe({
+      shiny::updateActionButton(
+        session,
+        "explorer_compare",
+        disabled = length(selected_countries()) < 2L
+      )
+    })
+
+    shiny::observeEvent(input$explorer_compare, {
+      data <- view_data()$data
+      selected <- selected_countries()
+      if (length(selected) < 2L || !"country_code" %in% names(data)) return()
+      on_compare(selected)
     })
 
     list(
@@ -269,7 +323,7 @@ country_explorer_server <- function(
       selected_year = selected_year,
       view_data = view_data,
       summary = summary,
-      selected_rows = shiny::reactive(input$explorer_table_rows_selected)
+      selected_rows = shiny::reactive(selected_countries())
     )
   })
 }

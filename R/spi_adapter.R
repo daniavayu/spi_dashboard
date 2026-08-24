@@ -48,6 +48,82 @@ spi_empty_aggregates <- function() {
   )
 }
 
+spi_empty_dimension_labels <- function() {
+  data.frame(
+    dimension_id = character(), dimension_label = character(),
+    stringsAsFactors = FALSE
+  )
+}
+
+spi_empty_label_lookup <- function(id_name, label_name) {
+  result <- data.frame(stringsAsFactors = FALSE)
+  result[[id_name]] <- character()
+  result[[label_name]] <- character()
+  result
+}
+
+spi_normalize_label_lookup <- function(
+  hierarchy, element, id_col, label_col
+) {
+  empty <- spi_empty_label_lookup(id_col, label_col)
+  if (!is.list(hierarchy) || is.null(hierarchy[[element]])) {
+    return(empty)
+  }
+  data <- hierarchy[[element]]
+  if (!is.data.frame(data) || nrow(data) == 0L ||
+    !all(c(id_col, label_col) %in% names(data))) {
+    return(empty)
+  }
+  result <- data.frame(
+    id = as.character(data[[id_col]]),
+    label = as.character(data[[label_col]]),
+    stringsAsFactors = FALSE
+  )
+  names(result) <- c(id_col, label_col)
+  result <- result[
+    !is.na(result[[id_col]]) & nzchar(result[[id_col]]) &
+      !is.na(result[[label_col]]) & nzchar(result[[label_col]]),
+    ,
+    drop = FALSE
+  ]
+  result <- result[!duplicated(result[[id_col]]), , drop = FALSE]
+  rownames(result) <- NULL
+  result
+}
+
+spi_normalize_pillar_labels <- function(hierarchy) {
+  spi_normalize_label_lookup(
+    hierarchy, "pillars", "pillar", "pillar_name"
+  )
+}
+
+spi_normalize_indicator_labels <- function(hierarchy) {
+  spi_normalize_label_lookup(
+    hierarchy, "indicators", "indicator", "indicator_name"
+  )
+}
+
+#' Normalize a SPI metadata hierarchy into a dimension label lookup
+#'
+#' Takes the list returned by the SPI metadata hierarchy function (a
+#' `pillars`/`dimensions`/`indicators` list, e.g. from `spiR::metadata()`)
+#' and extracts a flat `dimension_id` -> `dimension_label` lookup table,
+#' so dimension scores can be labeled with their human-readable name
+#' (e.g. `"Data use by international organisations"`) instead of a bare
+#' code (e.g. `"1.5"`).
+#'
+#' @param hierarchy A list with a `dimensions` element, as returned by the
+#'   metadata hierarchy provider function.
+#' @return A `data.frame` with `dimension_id` and `dimension_label` columns.
+#' @keywords internal
+spi_normalize_dimension_labels <- function(hierarchy) {
+  result <- spi_normalize_label_lookup(
+    hierarchy, "dimensions", "dimension", "dimension_name"
+  )
+  names(result) <- c("dimension_id", "dimension_label")
+  result
+}
+
 spi_as_year <- function(value) {
   suppressWarnings(as.integer(as.character(value)))
 }
@@ -289,10 +365,14 @@ spi_normalize_aggregates <- function(data, year = NULL) {
 }
 
 spi_available_years <- function(index_data) {
+  if (!is.data.frame(index_data) || nrow(index_data) == 0L) {
+    return(integer())
+  }
   year_col <- if ("year" %in% names(index_data)) "year" else "date"
   score_col <- if ("score" %in% names(index_data)) "score" else "SPI.INDEX"
-  years <- spi_as_year(index_data[[year_col]])
-  scores <- suppressWarnings(as.numeric(index_data[[score_col]]))
+  years <- unlist(spi_as_year(index_data[[year_col]]), use.names = FALSE)
+  scores <- unlist(suppressWarnings(as.numeric(index_data[[score_col]])),
+    use.names = FALSE)
   sort(unique(years[!is.na(years) & !is.na(scores)]))
 }
 

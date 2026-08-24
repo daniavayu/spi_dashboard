@@ -1,8 +1,8 @@
 ---
 date: 2026-08-13
 title: "Milestone 2: Country Explorer (Final Plan)"
-status: completed
-completed-date: 2026-08-13
+status: in-progress
+completed-date: null
 completed-phases: [1, 2]
 scope: "Standard"
 brainstorm: "../brainstorms/2026-08-12-milestone-2-country-explorer.md"
@@ -10,7 +10,7 @@ language: "R"
 estimated-effort: "medium"
 deviation-policy: "ask"
 artifact-schema-version: 1
-tags: [spi, shiny, golem, country-explorer, spiR, filters, table, pillars, dimensions, indicators, year-selector]
+tags: [spi, shiny, golem, country-explorer, compare-countries, spiR, filters, table, pillars, dimensions, indicators, year-selector, multi-selection]
 phases: 2
 ---
 
@@ -26,8 +26,26 @@ provider interpretation outside the Shiny UI layer.
 Country Explorer will load all available years once, allow the user to select
 a year locally, filter by region, income level, and country name, inspect
 summary statistics, use an interactive table, and select one country for a
-future Country Profile handoff. Overview keeps its current year state and
-behavior; changing the Country Explorer year does not change Overview.
+future Country Profile handoff. It will also allow users to select multiple
+countries and send them to the Compare Countries tab. Compare will provide a
+first functional comparison view using the selected ISO3 country codes.
+Overview keeps its current year state and behavior; changing the Country
+Explorer year does not change Overview.
+
+## Milestone 2 Scope Amendment
+
+The original plan treated multi-country selection and Compare Countries as
+later work. The product workflow now requires Country Explorer to be the entry
+point for comparison, so this amendment adds the smallest useful handoff:
+
+- Country Explorer uses checkbox-style multi-row selection.
+- `Compare Selected` is enabled only when at least two countries are selected.
+- The handoff stores stable ISO3 codes, not display names or table row numbers.
+- The existing top-level tab navigation opens Compare Countries after handoff.
+- Compare Countries displays the selected countries and a first comparison
+  chart for the selected Explorer year.
+- Full comparison controls, exports, weighting, ranking claims, and advanced
+  comparison views remain outside this amendment.
 
 ## Context
 
@@ -66,9 +84,11 @@ remains on `main`.
 | R7 | Provide region, income-level, country-search, reset, and independent Country Explorer year filters. | Approved scope adjustment |
 | R8 | Keep Overall SPI visible in every view and display missing values as `-`, never zero. | Country Explorer brainstorm |
 | R9 | Provide average, median, and standard deviation for the visible countries and active metric. | Country Explorer brainstorm |
-| R10 | Support table sorting, table search, and single-row selection. | Country Explorer brainstorm |
+| R10 | Support table sorting, table search, and multi-row checkbox selection. | Scope amendment |
 | R11 | Preserve partial coverage and provide controlled empty/unavailable states. | Milestone 1 data contract |
-| R12 | Keep `fragile/conflict`, Country Profile, Compare Countries, maps, downloads, rankings, weighting, and production changes out of scope. | Approved scope boundaries |
+| R12 | Keep `fragile/conflict`, Country Profile, maps, downloads, rankings, weighting, and production changes out of scope. | Approved scope boundaries |
+| R13 | Handoff two or more selected countries from Explorer to Compare Countries using ISO3 codes. | Scope amendment |
+| R14 | Render a first functional Compare Countries view for selected countries and Explorer year. | Scope amendment |
 
 ## Phase 1: Data Contract and Feature Logic
 
@@ -237,7 +257,9 @@ remains on `main`.
 - [ ] Region, income-level, and country-search filters.
 - [ ] Duplicate metadata resolution.
 - [ ] Missing values and partial coverage.
-- [ ] Table dependency, sorting, search, and single-row selection.
+- [x] Table dependency, sorting, search, and multi-row checkbox selection.
+- [x] Country Explorer to Compare Countries handoff using ISO3 codes.
+- [x] Initial Compare Countries view for selected countries and year.
 - [ ] Browser-level verification method.
 - [ ] Explicit statement that `fragile/conflict` filtering is excluded.
 - [ ] Boundary with Country Profile and Compare Countries.
@@ -254,13 +276,13 @@ remains on `main`.
 | DT is unavailable or omitted from clean installs. | Validate first, use `Imports` when selected, and test a clean package environment. |
 | Browser behavior differs from server tests. | Require browser smoke evidence for search, sorting, missing display, and selection. |
 | Fixture injection changes production wiring. | Make loader injection optional and test production defaults separately. |
-| Scope expands into later tabs. | Keep single-row selection and downstream tabs as placeholders. |
+| Scope expands into later tabs. | Keep Compare limited to selection handoff and one initial comparison view. |
 
 ## Out of Scope
 
 - `fragile/conflict` status and filtering.
 - Country Profile analysis.
-- Multi-country comparison or multi-row selection.
+- Advanced multi-country comparison controls beyond the initial handoff view.
 - New maps or Flourish changes.
 - Downloads and exports.
 - Custom weighting.
@@ -314,8 +336,8 @@ values display as `-`, and the sibling `spiR` repository remains unchanged.
   snapshot, pure helpers, independent Explorer year state, optional loader
   injection, compatible table dependency, Golem module, tests, documentation,
   and app registration.
-- **Out of scope**: `fragile/conflict`, Country Profile, Compare Countries,
-  multi-row selection, new maps, downloads, rankings, weighting, production
+- **Out of scope**: `fragile/conflict`, Country Profile, advanced comparison
+  controls, new maps, downloads, rankings, weighting, production
   deployment, and edits to `spiR`.
 
 ### Iteration Policy

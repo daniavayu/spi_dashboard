@@ -3,7 +3,10 @@ testthat::test_that("app server accepts a fixture snapshot loader", {
   env <- new.env(parent = globalenv())
   for (file in c("spi_adapter.R", "spi_provider.R", "overview_data.R",
     "mod_overview.R", "country_explorer_data.R",
-    "country_explorer_helpers.R", "mod_country_explorer.R",
+    "country_explorer_helpers.R", "country_profile_data.R",
+    "country_profile_helpers.R", "country_profile_visualizations.R",
+    "mod_country_explorer.R", "mod_country_compare.R",
+    "mod_country_profile.R",
     "app_server.R")) {
     sys.source(file.path(root, "R", file), envir = env)
   }
@@ -36,6 +39,8 @@ testthat::test_that("app server accepts a fixture snapshot loader", {
     fixture_server,
     {
       testthat::expect_equal(output$kpi_years, "2024")
+      session$setInputs(main_nav = "Country Profile")
+      testthat::expect_true(isTRUE(session$input$main_nav == "Country Profile"))
     }
   )
 })

@@ -70,8 +70,44 @@ testthat::test_that("Country Explorer renders an unavailable state without optio
     args = list(snapshot_loader = function() snapshot),
     {
       testthat::expect_equal(output$explorer_selected_year, "2024")
-      testthat::expect_equal(output$explorer_status,
-        "No data available for the selected filters")
+      testthat::expect_equal(output$explorer_status, "")
+    }
+  )
+})
+
+testthat::test_that("Country Explorer hands selected rows to Compare", {
+  root <- normalizePath(testthat::test_path("..", ".."))
+  env <- new.env(parent = globalenv())
+  for (file in c("spi_adapter.R", "country_explorer_data.R",
+    "country_explorer_helpers.R", "mod_country_explorer.R")) {
+    sys.source(file.path(root, "R", file), envir = env)
+  }
+
+  snapshot <- list(
+    index = data.frame(
+      country_code = c("AAA", "BBB"), country_name = c("Alpha", "Beta"),
+      year = c(2024L, 2024L), score = c(70, 80),
+      pillar_1_score = c(71, 81), stringsAsFactors = FALSE
+    ),
+    indicators = data.frame(), metadata = data.frame(),
+    operation_status = list()
+  )
+  compared <- NULL
+
+  shiny::testServer(
+    env$country_explorer_server,
+    args = list(
+      snapshot_loader = function() snapshot,
+      on_compare = function(countries) compared <<- countries
+    ),
+    {
+      session$setInputs(explorer_selected_country = "AAA|1")
+      session$flushReact()
+      session$setInputs(explorer_selected_country = "BBB|1")
+      session$flushReact()
+      session$setInputs(explorer_compare = 1L)
+      session$flushReact()
+      testthat::expect_equal(compared, c("AAA", "BBB"))
     }
   )
 })

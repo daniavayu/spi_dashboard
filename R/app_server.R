@@ -1,4 +1,5 @@
 app_server <- function(input, output, session, snapshot_loader = NULL) {
+  compare_countries <- shiny::reactiveVal(character())
   overview_loader <- if (is.null(snapshot_loader)) {
     function() spi_provider_snapshot(
       load_details = FALSE,
@@ -10,7 +11,7 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
   }
   explorer_loader <- if (is.null(snapshot_loader)) {
     function() spi_provider_snapshot(
-      load_details = TRUE,
+      load_details = FALSE,
       load_metadata = TRUE,
       load_aggregates = FALSE
     )
@@ -21,10 +22,36 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
     "overview",
     snapshot_loader = overview_loader
   )
-  country_explorer_server(
+  explorer <- country_explorer_server(
     "country_explorer",
     snapshot_loader = explorer_loader,
-    active = function() identical(input$main_nav, "Country Explorer")
+    active = function() identical(input$main_nav, "Country Explorer"),
+    on_compare = function(countries) {
+      compare_countries(countries)
+      shiny::updateTabsetPanel(
+        session, "main_nav", selected = "Compare Countries"
+      )
+    }
+  )
+  country_compare_server(
+    "country_compare",
+    snapshot_loader = explorer_loader,
+    selected_countries = compare_countries,
+    selected_year = explorer$selected_year
+  )
+  profile_loader <- if (is.null(snapshot_loader)) {
+    function() spi_profile_sections_from_snapshot(spi_provider_snapshot(
+      load_details = TRUE,
+      load_metadata = TRUE,
+      load_aggregates = TRUE
+    ))
+  } else {
+    function() spi_profile_sections_from_snapshot(snapshot_loader())
+  }
+  country_profile_server(
+    "country_profile",
+    profile_loader = profile_loader,
+    active = function() identical(input$main_nav, "Country Profile")
   )
 
   output$overview_flourish_map <- shiny::renderUI({

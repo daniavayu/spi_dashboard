@@ -37,6 +37,34 @@ testthat::test_that("indicator normalization preserves partial rows", {
   testthat::expect_equal(result$raw_value[[2]], 8)
 })
 
+testthat::test_that("dimension label normalization extracts a clean lookup", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  hierarchy <- list(
+    dimensions = data.frame(
+      pillar = c("1", "1"),
+      dimension = c("1.1", "1.2"),
+      dimension_name = c("Data use by national legislature", NA_character_),
+      stringsAsFactors = FALSE
+    )
+  )
+
+  result <- spi_normalize_dimension_labels(hierarchy)
+
+  testthat::expect_equal(result$dimension_id, "1.1")
+  testthat::expect_equal(result$dimension_label, "Data use by national legislature")
+})
+
+testthat::test_that("dimension label normalization tolerates missing or malformed hierarchies", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+
+  testthat::expect_equal(nrow(spi_normalize_dimension_labels(NULL)), 0L)
+  testthat::expect_equal(nrow(spi_normalize_dimension_labels(list())), 0L)
+  testthat::expect_equal(
+    nrow(spi_normalize_dimension_labels(list(dimensions = data.frame(bad = 1)))),
+    0L
+  )
+})
+
 testthat::test_that("aggregate normalization retains official source rows", {
   source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
   raw <- data.frame(

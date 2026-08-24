@@ -82,37 +82,5 @@ spi_plot_region_history <- function() {
   if (!requireNamespace("spiR", quietly = TRUE)) {
     stop("The spiR package is required for the regional history visualization.")
   }
-  plot <- spiR::spi_plot_regions(value_col = "SPI.INDEX")
-  regions <- getFromNamespace(
-    "SPI_PLOT_GEOGRAPHIC_REGIONS",
-    "spiR"
-  )
-  region_data <- getFromNamespace(
-    ".spi_plot_fetch_aggregates",
-    "spiR"
-  )(
-    value_cols = "SPI.INDEX",
-    region = regions
-  )
-  plot +
-    ggplot2::geom_line(
-      data = region_data,
-      mapping = ggplot2::aes(
-        x = date,
-        y = value,
-        color = region,
-        linetype = region,
-        group = region
-      ),
-      linewidth = 0.8,
-      inherit.aes = FALSE
-    ) +
-    ggplot2::scale_linetype_manual(
-      values = rep(c("solid", "dashed", "dotted", "dotdash"),
-        length.out = length(regions)
-      )
-    ) +
-    ggplot2::scale_x_continuous(
-      limits = c(2016, 2024)
-    )
+  spiR::spi_plot_regions(value_col = "SPI.INDEX")
 }

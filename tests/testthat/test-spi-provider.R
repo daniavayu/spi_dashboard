@@ -23,6 +23,12 @@ testthat::test_that("provider snapshot loads all years and records operation sta
     aggregates = function(year = NULL) data.frame(
       iso3c = "WLD", country = "World", date = 2024,
       source_id = "SPI.INDEX", value = 65
+    ),
+    hierarchy = function() list(
+      dimensions = data.frame(
+        pillar = "1", dimension = "1.1", dimension_name = "First dimension",
+        stringsAsFactors = FALSE
+      )
     )
   )
 
@@ -38,6 +44,9 @@ testthat::test_that("provider snapshot loads all years and records operation sta
   testthat::expect_true(all(vapply(snapshot$operation_status, function(x) {
     isTRUE(x$ok) && identical(x$status, "ok")
   }, logical(1))))
+  testthat::expect_equal(snapshot$dimension_labels$dimension_id, "1.1")
+  testthat::expect_equal(snapshot$dimension_labels$dimension_label,
+    "First dimension")
 })
 
 testthat::test_that("optional provider failures are controlled and overall data survives", {

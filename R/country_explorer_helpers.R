@@ -69,6 +69,22 @@ spi_explorer_attach_overall_changes <- function(snapshot, data) {
   if (!is.data.frame(data) || nrow(data) == 0L) return(data)
   index <- snapshot$index
   if (!is.data.frame(index) || nrow(index) == 0L) return(data)
+  
+  if (requireNamespace("spiR", quietly = TRUE) &&
+      exists("spi_change", asNamespace("spiR"), inherits = FALSE)) {
+    changes <- spiR::spi_change(
+      index,
+      value_col = "score",
+      group_cols = "country_code",
+      year_col = "year"
+    )
+    change_key <- paste(changes$country_code, changes$year, sep = "_")
+    data_key <- paste(data$country_code, data$year, sep = "_")
+    data$change_previous <- changes$change_previous[match(data_key, change_key)]
+    data$change_first <- changes$change_first[match(data_key, change_key)]
+    return(data)
+  }
+  
   index_year <- suppressWarnings(as.integer(index$year))
   data$change_previous <- NA_real_
   data$change_first <- NA_real_
@@ -145,7 +161,22 @@ spi_explorer_view <- function(
   base <- filtered$data
   if (view == "pillars") {
     columns <- grep("^pillar_[0-9]+_score$", names(base), value = TRUE)
-    data <- spi_explorer_metric_rows(base, columns, "pillar_", "Pillar")
+    if (length(columns) > 0L) {
+      data <- spi_explorer_metric_rows(base, columns, "pillar_", "Pillar")
+    } else {
+      data <- data.frame(
+        country_code = base$country_code,
+        country_name = base$country_name,
+        year = base$year,
+        region = base$region,
+        income_group = base$income_group,
+        overall_spi = base$overall_spi,
+        metric_id = "overall",
+        metric_label = "Overall SPI",
+        metric_score = base$overall_spi,
+        stringsAsFactors = FALSE
+      )
+    }
     data <- spi_explorer_attach_overall_changes(snapshot, data)
   } else if (view == "dimensions") {
     columns <- grep("^dimension_[0-9]+_[0-9]+_score$", names(base), value = TRUE)

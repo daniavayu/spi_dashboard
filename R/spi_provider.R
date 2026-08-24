@@ -13,7 +13,7 @@ spi_provider_functions <- function(
         call. = FALSE
       )
     }
-    optional <- c("indicators", "metadata", "aggregates")
+    optional <- c("indicators", "metadata", "aggregates", "hierarchy")
     for (operation in setdiff(optional, names(provider_functions))) {
       provider_functions[operation] <- list(NULL)
     }
@@ -27,7 +27,8 @@ spi_provider_functions <- function(
       index = spiR::spi_index,
       indicators = spiR::spi_data,
       metadata = spiR::country_info,
-      aggregates = spiR::spi_aggregates
+      aggregates = spiR::spi_aggregates,
+      hierarchy = spiR::metadata
     ))
   }
 
@@ -37,7 +38,8 @@ spi_provider_functions <- function(
     index = spi_index,
     indicators = spi_data,
     metadata = country_info,
-    aggregates = spi_aggregates
+    aggregates = spi_aggregates,
+    hierarchy = metadata
   )
 }
 
@@ -101,6 +103,36 @@ spi_provider_call <- function(provider, operation, year = NULL) {
   on.exit(options(timeout = previous_timeout), add = TRUE)
   result <- tryCatch(
     function_value(year = year),
+    error = function(error) {
+      list(
+        ok = FALSE,
+        status = "error",
+        error = conditionMessage(error),
+        value = NULL
+      )
+    }
+  )
+  if (is.list(result) && identical(result$ok, FALSE)) {
+    return(result)
+  }
+  list(ok = TRUE, status = "ok", error = NULL, value = result)
+}
+
+# The hierarchy operation (pillar/dimension/indicator metadata, e.g.
+# spiR::metadata()) takes no `year` argument, so it cannot share the
+# `spi_provider_call()` calling convention used by the other operations.
+spi_provider_call_hierarchy <- function(provider) {
+  function_value <- provider$hierarchy
+  if (!is.function(function_value)) {
+    return(list(
+      ok = FALSE,
+      status = "unavailable",
+      error = "Provider operation is unavailable: hierarchy",
+      value = NULL
+    ))
+  }
+  result <- tryCatch(
+    suppressWarnings(function_value()),
     error = function(error) {
       list(
         ok = FALSE,
@@ -202,6 +234,28 @@ spi_provider_snapshot <- function(
   aggregates <- aggregates_result$value
   operation_status$aggregates <- aggregates_result$status
 
+  hierarchy_result <- if (isTRUE(load_details)) {
+    hierarchy_call <- spi_provider_call_hierarchy(provider)
+    list(
+      value = if (isTRUE(hierarchy_call$ok)) hierarchy_call$value else NULL,
+      status = hierarchy_call[c("ok", "status", "error")]
+    )
+  } else {
+    list(
+      value = NULL,
+      status = list(
+        ok = FALSE,
+        status = "unavailable",
+        error = "Operation was not requested"
+      )
+    )
+  }
+  hierarchy <- hierarchy_result$value
+  dimension_labels <- spi_normalize_dimension_labels(hierarchy)
+  pillar_labels <- spi_normalize_pillar_labels(hierarchy)
+  indicator_labels <- spi_normalize_indicator_labels(hierarchy)
+  operation_status$hierarchy <- hierarchy_result$status
+
   income_data <- if (nrow(metadata) > 0L) {
     spi_normalize_income_data(index_raw, metadata, year = year)
   } else {
@@ -219,6 +273,9 @@ spi_provider_snapshot <- function(
     income_data = income_data,
     metadata = metadata,
     aggregates = aggregates,
+    pillar_labels = pillar_labels,
+    dimension_labels = dimension_labels,
+    indicator_labels = indicator_labels,
     years = spi_available_years(index),
     operation_status = operation_status
   )

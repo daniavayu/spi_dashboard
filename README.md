@@ -16,9 +16,9 @@ package with `pkgload::load_all()` and then calls `spiDashboard::run_app()`.
 In RStudio, open `app.R` and use the blue Run App button. For deployment,
 use `rsconnect::deployApp()` after configuring the deployment account.
 
-The application is unauthenticated. The Overview and Country Explorer tabs
-are available in the current milestones; later dashboard tabs remain outside
-the implemented scope.
+The application is unauthenticated. Overview, Country Explorer, and the
+single-country Country Profile tabs are available in the current milestones;
+later dashboard tabs remain outside the implemented scope.
 
 ## Country Explorer
 
@@ -26,8 +26,8 @@ Country Explorer loads an all-years snapshot once and filters the selected
 year locally, independently of the Overview year. Pillars are the default
 view; Dimensions and Indicators are available from the view selector. The
 table keeps Overall SPI visible and supports region, income-group, country
-search, reset, sorting, search, and single-row selection. Summary statistics
-describe the visible countries and active metric. Missing values are shown as
+search, reset, sorting, and search. Summary statistics describe the visible
+countries and active metric. Missing values are shown as
 `-`, and `fragile/conflict` indicators are outside this milestone.
 
 The Explorer uses normalized provider data: `spiR::spi_index()` supplies
@@ -39,8 +39,23 @@ with conflicting non-missing values treated as missing. Optional provider
 operations expose controlled unavailable/error states while the mandatory
 overall index remains authoritative.
 
-Country Profile, Compare Countries, maps, downloads, rankings, weighting, and
-production deployment are not part of this milestone.
+## Country Profile
+
+Country Profile is selected directly from the top-level navigation. It owns
+its country and year controls independently from Overview and Country Explorer
+and presents one country at a time. Sections report `pending`, `ok`, `partial`,
+`empty`, `unavailable`, or `error` independently; missing values remain
+missing and display as `-`. Region and income-group values are contextual
+official-reference benchmarks, not rankings or causal comparisons.
+
+The development checkout of `spiR` is a provisional future API and is verified
+with `devtools::load_all()` before provider wiring. `spiR` remains preferred,
+with the local functions as fallback. The dashboard does not call raw provider
+functions from UI modules, and it does not modify the external `spiR`
+repository.
+
+Country comparison, Explorer handoff, downloads, rankings, weighting, new
+maps, and production deployment are excluded.
 
 ## Data provider
 
@@ -48,6 +63,10 @@ The application prefers the `spiR` package and keeps the local functions in
 `functions/` as an explicit fallback. Provider selection and schema
 normalization are isolated under `R/` so Shiny modules do not interpret
 upstream column names directly.
+
+The complete function-to-visualization mapping, including functions already
+connected, dashboard-only charts, and remaining migration work, is documented
+in [`.cg-docs/spiR-dashboard-visualization-mapping.md`](.cg-docs/spiR-dashboard-visualization-mapping.md).
 
 ## Development checks
 
