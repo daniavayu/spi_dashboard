@@ -94,7 +94,7 @@ spi_download <- function(file_path, version = "master") {
   }
 
   dt <- tryCatch(
-    fread(tmp, data.table = TRUE, encoding = "UTF-8"),
+    data.table::fread(tmp, data.table = TRUE, encoding = "UTF-8"),
     error = function(e) {
       cli::cli_abort(c(
         "Failed to parse the downloaded CSV file.",

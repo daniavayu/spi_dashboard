@@ -92,9 +92,16 @@ spi_normalize_label_lookup <- function(
 }
 
 spi_normalize_pillar_labels <- function(hierarchy) {
-  spi_normalize_label_lookup(
+  result <- spi_normalize_label_lookup(
     hierarchy, "pillars", "pillar", "pillar_name"
   )
+  if (nrow(result) > 0L) {
+    result[["pillar_name"]] <- sub(
+      "^Pillar [0-9]+: ", "", result[["pillar_name"]]
+    )
+  }
+  names(result) <- c("pillar_id", "pillar_label")
+  result
 }
 
 spi_normalize_indicator_labels <- function(hierarchy) {
@@ -120,6 +127,11 @@ spi_normalize_dimension_labels <- function(hierarchy) {
   result <- spi_normalize_label_lookup(
     hierarchy, "dimensions", "dimension", "dimension_name"
   )
+  if (nrow(result) > 0L) {
+    result[["dimension_name"]] <- sub(
+      "^Dimension [0-9]+\\.[0-9]+: ", "", result[["dimension_name"]]
+    )
+  }
   names(result) <- c("dimension_id", "dimension_label")
   result
 }

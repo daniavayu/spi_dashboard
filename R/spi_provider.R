@@ -236,6 +236,15 @@ spi_provider_snapshot <- function(
 
   hierarchy_result <- if (isTRUE(load_details)) {
     hierarchy_call <- spi_provider_call_hierarchy(provider)
+    if (!isTRUE(hierarchy_call$ok) && identical(provider$name, "spiR")) {
+      local_provider <- spi_provider_functions(
+        preferred = "local", root = root
+      )
+      local_hierarchy_call <- spi_provider_call_hierarchy(local_provider)
+      if (isTRUE(local_hierarchy_call$ok)) {
+        hierarchy_call <- local_hierarchy_call
+      }
+    }
     list(
       value = if (isTRUE(hierarchy_call$ok)) hierarchy_call$value else NULL,
       status = hierarchy_call[c("ok", "status", "error")]

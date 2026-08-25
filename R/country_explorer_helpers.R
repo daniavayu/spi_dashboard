@@ -65,6 +65,33 @@ spi_explorer_metric_rows <- function(base, metric_columns, prefix, label_prefix)
   do.call(rbind, rows)
 }
 
+spi_explorer_lookup_labels <- function(ids, fallback, lookup, id_col, label_col) {
+  if (!is.data.frame(lookup) || nrow(lookup) == 0L ||
+    !all(c(id_col, label_col) %in% names(lookup))) {
+    return(fallback)
+  }
+  requested <- as.character(ids)
+  lookup_ids <- as.character(lookup[[id_col]])
+  if (id_col %in% c("pillar", "pillar_id")) {
+    requested <- sub("^P", "", requested, ignore.case = TRUE)
+    requested <- sub("^SPI\\.INDEX\\.PIL", "", requested,
+      ignore.case = TRUE)
+    lookup_ids <- sub("^P", "", lookup_ids, ignore.case = TRUE)
+    lookup_ids <- sub("^SPI\\.INDEX\\.PIL", "", lookup_ids,
+      ignore.case = TRUE)
+  }
+  if (id_col %in% c("dimension", "dimension_id")) {
+    requested <- sub("^D", "", requested, ignore.case = TRUE)
+    requested <- sub("^SPI\\.DIM", "", requested, ignore.case = TRUE)
+    requested <- sub("\\.INDEX$", "", requested, ignore.case = TRUE)
+    lookup_ids <- sub("^D", "", lookup_ids, ignore.case = TRUE)
+    lookup_ids <- sub("^SPI\\.DIM", "", lookup_ids, ignore.case = TRUE)
+    lookup_ids <- sub("\\.INDEX$", "", lookup_ids, ignore.case = TRUE)
+  }
+  labels <- as.character(lookup[[label_col]])[match(requested, lookup_ids)]
+  ifelse(is.na(labels) | !nzchar(labels), fallback, labels)
+}
+
 spi_explorer_attach_overall_changes <- function(snapshot, data) {
   if (!is.data.frame(data) || nrow(data) == 0L) return(data)
   index <- snapshot$index
@@ -190,7 +217,13 @@ spi_explorer_view <- function(
         indicator_id <- indicators$indicator_id[[1L]]
       }
       indicators <- indicators[indicators$indicator_id == indicator_id, , drop = FALSE]
-      indicators <- indicators[indicators$year == filtered$selected_year, , drop = FALSE]
+      indicator_years <- sort(unique(indicators$year[!is.na(indicators$year)]))
+      indicator_year <- filtered$selected_year
+      if (length(indicator_years) > 0L &&
+        !indicator_year %in% indicator_years) {
+        indicator_year <- max(indicator_years)
+      }
+      indicators <- indicators[indicators$year == indicator_year, , drop = FALSE]
       match_row <- match(indicators$country_code, base$country_code)
       keep <- !is.na(match_row)
       indicators <- indicators[keep, , drop = FALSE]
@@ -208,6 +241,24 @@ spi_explorer_view <- function(
         stringsAsFactors = FALSE
       )
     }
+  }
+  if (view == "pillars" && nrow(data) > 0L) {
+    data$metric_label <- spi_explorer_lookup_labels(
+      data$metric_id, data$metric_label, snapshot$pillar_labels,
+      "pillar_id", "pillar_label"
+    )
+  }
+  if (view == "dimensions" && nrow(data) > 0L) {
+    data$metric_label <- spi_explorer_lookup_labels(
+      data$metric_id, data$metric_label, snapshot$dimension_labels,
+      "dimension_id", "dimension_label"
+    )
+  }
+  if (view == "indicators" && nrow(data) > 0L) {
+    data$metric_label <- spi_explorer_lookup_labels(
+      data$metric_id, data$metric_label, snapshot$indicator_labels,
+      "indicator_id", "indicator_label"
+    )
   }
   rownames(data) <- NULL
   list(

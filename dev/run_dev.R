@@ -12,4 +12,7 @@ pkgload::load_all(
   attach_testthat = FALSE
 )
 options(golem.app.prod = FALSE)
-spiDashboard::run_app()
+shiny::runApp(
+  spiDashboard::run_app(),
+  launch.browser = TRUE
+)
