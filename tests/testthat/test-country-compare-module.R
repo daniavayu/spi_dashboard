@@ -1,6 +1,8 @@
 testthat::test_that("Compare Countries UI exposes the selection handoff", {
   root <- normalizePath(testthat::test_path("..", ".."))
   env <- new.env(parent = globalenv())
+  sys.source(file.path(root, "R", "country_compare_helpers.R"), envir = env)
+  sys.source(file.path(root, "R", "country_compare_data.R"), envir = env)
   sys.source(file.path(root, "R", "mod_country_compare.R"), envir = env)
 
   ui <- env$country_compare_ui("compare")
@@ -14,6 +16,8 @@ testthat::test_that("Compare Countries UI exposes the selection handoff", {
 testthat::test_that("Compare Countries displays an empty handoff state", {
   root <- normalizePath(testthat::test_path("..", ".."))
   env <- new.env(parent = globalenv())
+  sys.source(file.path(root, "R", "country_compare_helpers.R"), envir = env)
+  sys.source(file.path(root, "R", "country_compare_data.R"), envir = env)
   sys.source(file.path(root, "R", "mod_country_compare.R"), envir = env)
 
   snapshot <- list(index = data.frame())

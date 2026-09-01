@@ -144,3 +144,56 @@ testthat::test_that("missing optional operations are unavailable without abortin
   testthat::expect_equal(snapshot$operation_status$indicators$status, "unavailable")
   testthat::expect_equal(snapshot$operation_status$aggregates$status, "unavailable")
 })
+
+testthat::test_that("reconciled labels are applied to indicators data frame", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  source(testthat::test_path("..", "..", "R", "spi_provider.R"), local = TRUE)
+
+  provider_functions <- list(
+    name = "stub",
+    index = function(year = NULL) data.frame(
+      iso3c = "AAA", country = "Alpha", date = 2024,
+      SPI.INDEX = 70, check.names = FALSE
+    ),
+    indicators = function(year = NULL) data.frame(
+      iso3c = "AAA", country = "Alpha", date = 2024,
+      SPI.D3.2.HNGR = 80, SPI.D4.1.1.POPU = 90,
+      check.names = FALSE
+    ),
+    metadata = function(year = NULL) data.frame(
+      iso3c = "AAA", country = "Alpha", date = 2024,
+      region = "Region A", income_level = "HIC"
+    ),
+    aggregates = function(year = NULL) data.frame(
+      iso3c = "WLD", country = "World", date = 2024,
+      source_id = "SPI.INDEX", value = 65
+    ),
+    hierarchy = function() list(
+      pillars = data.frame(
+        pillar = c("3", "4"),
+        pillar_name = c("Pillar 3: Data Products", "Pillar 4: Data Sources"),
+        stringsAsFactors = FALSE
+      ),
+      indicators = data.frame(
+        indicator_id = c("SPI.D3.1.HNGR", "SPI.D4.1.POPU"),
+        indicator_name = c(
+          "Indicator 3.1.2: GOAL 2: Zero Hunger",
+          "Indicator 4.1.1: Population census"
+        ),
+        stringsAsFactors = FALSE
+      )
+    )
+  )
+
+  snapshot <- spi_provider_snapshot(
+    preferred = "stub", provider_functions = provider_functions
+  )
+
+  ind <- snapshot$indicators
+  hngr <- ind[ind$indicator_id == "SPI.D3.2.HNGR", "indicator_label"]
+  popu <- ind[ind$indicator_id == "SPI.D4.1.1.POPU", "indicator_label"]
+  testthat::expect_equal(unique(hngr), "Indicator 3.1.2: GOAL 2: Zero Hunger")
+  testthat::expect_equal(unique(popu), "Indicator 4.1.1: Population census")
+  testthat::expect_equal(unique(ind$pillar_label[ind$pillar_id == "D3"]),
+    "Data Products")
+})

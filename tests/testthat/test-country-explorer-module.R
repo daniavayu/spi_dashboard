@@ -112,6 +112,120 @@ testthat::test_that("Country Explorer hands selected rows to Compare", {
   )
 })
 
+testthat::test_that("Country selection does not restrict exploratory filters", {
+  root <- normalizePath(testthat::test_path("..", ".."))
+  env <- new.env(parent = globalenv())
+  for (file in c("spi_adapter.R", "country_explorer_data.R",
+    "country_explorer_helpers.R", "mod_country_explorer.R")) {
+    sys.source(file.path(root, "R", file), envir = env)
+  }
+
+  snapshot <- list(
+    index = data.frame(
+      country_code = c("AAA", "BBB"), country_name = c("Alpha", "Beta"),
+      year = c(2024L, 2024L), score = c(70, 80),
+      pillar_1_score = c(71, 81), stringsAsFactors = FALSE
+    ),
+    indicators = data.frame(),
+    metadata = data.frame(
+      country_code = c("AAA", "BBB"), country_name = c("Alpha", "Beta"),
+      year = c(2024L, 2024L), region = c("Region A", "Region B"),
+      income_group = c("HIC", "MIC"), stringsAsFactors = FALSE
+    ),
+    operation_status = list()
+  )
+
+  shiny::testServer(
+    env$country_explorer_server,
+    args = list(snapshot_loader = function() snapshot),
+    {
+      session$setInputs(explorer_region = "Region B")
+      session$flushReact()
+      session$setInputs(explorer_country = "AAA")
+      session$flushReact()
+
+      testthat::expect_equal(output$explorer_average, "76.00")
+    }
+  )
+})
+
+testthat::test_that("Country search adds a country outside the income filter", {
+  root <- normalizePath(testthat::test_path("..", ".."))
+  env <- new.env(parent = globalenv())
+  for (file in c("spi_adapter.R", "country_explorer_data.R",
+    "country_explorer_helpers.R", "mod_country_explorer.R")) {
+    sys.source(file.path(root, "R", file), envir = env)
+  }
+
+  snapshot <- list(
+    index = data.frame(
+      country_code = c("LIC", "CHL"), country_name = c("Lowland", "Chile"),
+      year = c(2024L, 2024L), score = c(50, 80),
+      pillar_1_score = c(51, 81), stringsAsFactors = FALSE
+    ),
+    indicators = data.frame(),
+    metadata = data.frame(
+      country_code = c("LIC", "CHL"), country_name = c("Lowland", "Chile"),
+      year = c(2024L, 2024L), region = c("Region X", "Latin America"),
+      income_group = c("Low income", "High income"), stringsAsFactors = FALSE
+    ),
+    operation_status = list()
+  )
+
+  shiny::testServer(
+    env$country_explorer_server,
+    args = list(snapshot_loader = function() snapshot),
+    {
+      session$setInputs(explorer_income = "Low income")
+      session$setInputs(explorer_country = "CHL")
+      session$flushReact()
+
+      testthat::expect_equal(output$explorer_average, "66.00")
+    }
+  )
+})
+
+testthat::test_that("Country search and checkbox selection are separate", {
+  root <- normalizePath(testthat::test_path("..", ".."))
+  env <- new.env(parent = globalenv())
+  for (file in c("spi_adapter.R", "country_explorer_data.R",
+    "country_explorer_helpers.R", "mod_country_explorer.R")) {
+    sys.source(file.path(root, "R", file), envir = env)
+  }
+
+  snapshot <- list(
+    index = data.frame(
+      country_code = c("AAA", "BBB"), country_name = c("Alpha", "Beta"),
+      year = c(2024L, 2024L), score = c(70, 80), stringsAsFactors = FALSE
+    ),
+    indicators = data.frame(), metadata = data.frame(),
+    operation_status = list()
+  )
+  compared <- NULL
+
+  shiny::testServer(
+    env$country_explorer_server,
+    args = list(
+      snapshot_loader = function() snapshot,
+      on_compare = function(countries) compared <<- countries
+    ),
+    {
+      session$setInputs(explorer_country = "AAA")
+      session$flushReact()
+      session$setInputs(explorer_country = "BBB")
+      session$flushReact()
+      session$setInputs(explorer_selected_country = "AAA|1")
+      session$flushReact()
+      session$setInputs(explorer_selected_country = "BBB|1")
+      session$flushReact()
+      session$setInputs(explorer_compare = 1L)
+      session$flushReact()
+
+      testthat::expect_equal(compared, c("AAA", "BBB"))
+    }
+  )
+})
+
 testthat::test_that("inactive Country Explorer does not load its provider", {
   root <- normalizePath(testthat::test_path("..", ".."))
   env <- new.env(parent = globalenv())

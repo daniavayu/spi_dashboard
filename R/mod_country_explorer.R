@@ -11,8 +11,7 @@ country_explorer_ui <- function(id) {
       )),
       shiny::selectInput(ns("explorer_region"), "Region", choices = ""),
       shiny::selectInput(ns("explorer_income"), "Income level", choices = ""),
-      shiny::textInput(ns("explorer_country"), "Search country", value = "",
-        placeholder = "Type country name..."),
+      shiny::uiOutput(ns("explorer_country_ui")),
       shiny::uiOutput(ns("explorer_indicator_ui")),
       shiny::actionButton(ns("explorer_compare"), "Compare Selected"),
       shiny::actionButton(ns("explorer_reset"), "Reset")
@@ -39,9 +38,10 @@ country_explorer_server <- function(
 ) {
   shiny::moduleServer(id, function(input, output, session) {
     snapshot <- shiny::reactiveVal(NULL)
-  selected_countries <- shiny::reactiveVal(character())
+    selected_countries <- shiny::reactiveVal(character())
+    searched_countries <- shiny::reactiveVal(character())
     selected_country_input <- session$ns("explorer_selected_country")
-    shiny::observeEvent(active(), {
+    shiny::observe({
       if (isTRUE(active()) && is.null(snapshot())) {
         snapshot(tryCatch(
           snapshot_loader(),
@@ -64,7 +64,7 @@ country_explorer_server <- function(
           }
         ))
       }
-    }, ignoreInit = FALSE)
+    })
     snapshot_value <- shiny::reactive({
       value <- snapshot()
       if (is.null(value)) {
@@ -97,6 +97,14 @@ country_explorer_server <- function(
         c("indicator_id", "indicator_label"), drop = FALSE]
       stats::setNames(unique_rows$indicator_id, unique_rows$indicator_label)
     })
+    country_choices <- shiny::reactive({
+      base <- spi_explorer_base(snapshot_value())$data
+      if (!is.data.frame(base) || nrow(base) == 0L) return(character())
+      rows <- unique(base[c("country_code", "country_name")])
+      rows <- rows[order(tolower(rows$country_name)), , drop = FALSE]
+      stats::setNames(as.character(rows$country_code),
+        as.character(rows$country_name))
+    })
 
     shiny::observeEvent(snapshot(), {
       years <- available_years()
@@ -127,13 +135,31 @@ country_explorer_server <- function(
       shiny::selectInput(
         session$ns("explorer_indicator"),
         "Indicator",
-        choices = choices,
-        selected = if (length(choices) > 0L) choices[[1L]] else character()
+        choices = c("All" = "__all__", choices),
+        selected = "__all__",
+        multiple = TRUE
+      )
+    })
+    output$explorer_country_ui <- shiny::renderUI({
+      choices <- country_choices()
+      shiny::selectInput(
+        session$ns("explorer_country"), "Country",
+        choices = c("Search country" = "", choices),
+        selected = ""
       )
     })
 
+    shiny::observeEvent(input$explorer_country, {
+      countries <- as.character(input$explorer_country)
+      countries <- countries[!is.na(countries) & nzchar(countries)]
+      if (length(countries) > 0L) {
+        searched_countries(unique(c(searched_countries(), countries)))
+      }
+    }, ignoreInit = TRUE)
+
     shiny::observeEvent(input$explorer_reset, {
       selected_countries(character())
+      searched_countries(character())
       years <- available_years()
       shiny::updateSelectInput(
         session, "explorer_year",
@@ -142,8 +168,12 @@ country_explorer_server <- function(
       shiny::updateSelectInput(session, "explorer_view", selected = "pillars")
       shiny::updateSelectInput(session, "explorer_region", selected = "")
       shiny::updateSelectInput(session, "explorer_income", selected = "")
-      shiny::updateSelectInput(session, "explorer_indicator", selected = "")
-      shiny::updateTextInput(session, "explorer_country", value = "")
+      shiny::updateSelectInput(
+        session, "explorer_indicator", selected = "__all__"
+      )
+      shiny::updateSelectInput(
+        session, "explorer_country", selected = ""
+      )
     })
 
     selected_year <- shiny::reactive({
@@ -169,8 +199,11 @@ country_explorer_server <- function(
         year = selected_year(),
         region = input$explorer_region,
         income_group = input$explorer_income,
-        country_search = input$explorer_country,
-        indicator_id = input$explorer_indicator
+        country_search = NULL,
+        indicator_id = input$explorer_indicator,
+        selected_countries = unique(c(
+          selected_countries(), searched_countries()
+        ))
       )
     })
     summary <- shiny::reactive(spi_explorer_summary(view_data()$data))
@@ -208,18 +241,29 @@ country_explorer_server <- function(
       if (nrow(data) == 0L) {
         data <- spi_explorer_empty_table()[0, , drop = FALSE]
       }
-      if (nrow(data) > 0L && selected_view %in% c("pillars", "dimensions") &&
+      if (nrow(data) > 0L && selected_view %in% c(
+        "pillars", "dimensions", "indicators"
+      ) &&
         all(c("metric_label", "metric_score") %in% names(data))) {
         data <- spi_explorer_widen_metrics(data)
       }
-      data$Select <- paste0(
-        '<input type="checkbox" class="spi-country-select" ',
-        'data-country-code="', data$country_code, '" ',
-        "onchange=\"Shiny.setInputValue('", selected_country_input,
-        "', this.dataset.countryCode + '|' + ",
-        "(this.checked ? '1' : '0'), {priority: 'event'})\" ",
-        'aria-label="Select country" />'
-      )
+      selected_for_display <- selected_countries()
+      data$Select <- if (nrow(data) == 0L) {
+        character()
+      } else {
+        paste0(
+          '<input type="checkbox" class="spi-country-select" ',
+          'data-country-code="', data$country_code, '" ',
+          ifelse(
+            as.character(data$country_code) %in% selected_for_display,
+            "checked ", ""
+          ),
+          "onchange=\"Shiny.setInputValue('", selected_country_input,
+          "', this.dataset.countryCode + '|' + ",
+          "(this.checked ? '1' : '0'), {priority: 'event'})\" ",
+          'aria-label="Select country" />'
+        )
+      }
       data <- data[, c("Select", setdiff(names(data), "Select")), drop = FALSE]
       display_names <- c(
         country_code = "Code",

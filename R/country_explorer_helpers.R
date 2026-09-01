@@ -3,7 +3,8 @@ spi_explorer_filter <- function(
   year = NULL,
   region = NULL,
   income_group = NULL,
-  country_search = NULL
+  country_search = NULL,
+  selected_countries = NULL
 ) {
   base <- spi_explorer_base(snapshot)
   available_years <- sort(unique(base$data$year[!is.na(base$data$year)]))
@@ -15,20 +16,49 @@ spi_explorer_filter <- function(
   } else {
     as.integer(year)
   }
-  result <- base$data[base$data$year == selected_year, , drop = FALSE]
-  if (!is.null(region) && nzchar(region)) {
-    result <- result[!is.na(result$region) & result$region == region, , drop = FALSE]
-  }
-  if (!is.null(income_group) && nzchar(income_group)) {
-    result <- result[
-      !is.na(result$income_group) & result$income_group == income_group,
-      , drop = FALSE
+  year_data <- base$data[base$data$year == selected_year, , drop = FALSE]
+  result <- year_data
+  search_countries <- character()
+  if (!is.null(country_search) && length(country_search) > 0L) {
+    search_countries <- as.character(country_search)
+    search_countries <- search_countries[
+      !is.na(search_countries) & nzchar(search_countries) &
+        search_countries != "__all__"
     ]
   }
-  if (!is.null(country_search) && nzchar(country_search)) {
-    pattern <- tolower(country_search)
-    matches <- grepl(pattern, tolower(result$country_name), fixed = TRUE)
-    result <- result[!is.na(matches) & matches, , drop = FALSE]
+  if (length(search_countries) > 0L) {
+    country_codes <- as.character(result$country_code)
+    if (all(search_countries %in% country_codes)) {
+      result <- result[country_codes %in% search_countries, , drop = FALSE]
+    } else {
+      pattern <- paste(tolower(search_countries), collapse = "|")
+      matches <- grepl(pattern, tolower(result$country_name))
+      result <- result[!is.na(matches) & matches, , drop = FALSE]
+    }
+  } else {
+    if (!is.null(region) && nzchar(region)) {
+      result <- result[
+        !is.na(result$region) & result$region == region, , drop = FALSE
+      ]
+    }
+    if (!is.null(income_group) && nzchar(income_group)) {
+      result <- result[
+        !is.na(result$income_group) & result$income_group == income_group,
+        , drop = FALSE
+      ]
+    }
+  }
+  selected_for_compare <- as.character(selected_countries)
+  selected_for_compare <- selected_for_compare[
+    !is.na(selected_for_compare) & nzchar(selected_for_compare) &
+      selected_for_compare != "__all__"
+  ]
+  if (length(selected_for_compare) > 0L && length(search_countries) == 0L) {
+    selected_rows <- year_data[
+      as.character(year_data$country_code) %in% selected_for_compare,
+      , drop = FALSE
+    ]
+    result <- unique(rbind(result, selected_rows))
   }
   rownames(result) <- NULL
   list(
@@ -178,12 +208,14 @@ spi_explorer_view <- function(
   region = NULL,
   income_group = NULL,
   country_search = NULL,
-  indicator_id = NULL
+  indicator_id = NULL,
+  selected_countries = NULL
 ) {
   view <- match.arg(view)
   filtered <- spi_explorer_filter(
     snapshot, year = year, region = region,
-    income_group = income_group, country_search = country_search
+    income_group = income_group, country_search = country_search,
+    selected_countries = selected_countries
   )
   base <- filtered$data
   if (view == "pillars") {
@@ -213,17 +245,36 @@ spi_explorer_view <- function(
     if (!is.data.frame(indicators) || nrow(indicators) == 0L) {
       data <- spi_explorer_empty_table()[0, , drop = FALSE]
     } else {
-      if (is.null(indicator_id) || !nzchar(indicator_id)) {
-        indicator_id <- indicators$indicator_id[[1L]]
+      selected_indicators <- as.character(indicator_id)
+      selected_indicators <- selected_indicators[
+        !is.na(selected_indicators) & nzchar(selected_indicators) &
+          selected_indicators != "__all__"
+      ]
+      if (length(selected_indicators) == 0L) {
+        selected_indicators <- unique(indicators$indicator_id)
       }
-      indicators <- indicators[indicators$indicator_id == indicator_id, , drop = FALSE]
-      indicator_years <- sort(unique(indicators$year[!is.na(indicators$year)]))
-      indicator_year <- filtered$selected_year
-      if (length(indicator_years) > 0L &&
-        !indicator_year %in% indicator_years) {
-        indicator_year <- max(indicator_years)
+      indicators <- indicators[
+        indicators$indicator_id %in% selected_indicators, , drop = FALSE
+      ]
+      requested_year <- filtered$selected_year
+      keep_rows <- logical(nrow(indicators))
+      for (current_indicator in selected_indicators) {
+        indicator_rows <- which(
+          indicators$indicator_id == current_indicator
+        )
+        indicator_years <- indicators$year[indicator_rows]
+        indicator_years <- indicator_years[!is.na(indicator_years)]
+        target_year <- if (requested_year %in% indicator_years) {
+          requested_year
+        } else if (length(indicator_years) > 0L) {
+          max(indicator_years)
+        } else {
+          requested_year
+        }
+        keep_rows[indicator_rows] <- indicators$year[indicator_rows] ==
+          target_year
       }
-      indicators <- indicators[indicators$year == indicator_year, , drop = FALSE]
+      indicators <- indicators[keep_rows, , drop = FALSE]
       match_row <- match(indicators$country_code, base$country_code)
       keep <- !is.na(match_row)
       indicators <- indicators[keep, , drop = FALSE]

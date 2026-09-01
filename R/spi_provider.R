@@ -148,6 +148,35 @@ spi_provider_call_hierarchy <- function(provider) {
   list(ok = TRUE, status = "ok", error = NULL, value = result)
 }
 
+# Fallback: read raw metadata (bypassing metadata() assertion) and build
+# a minimal hierarchy list suitable for label normalization.
+spi_provider_raw_hierarchy <- function() {
+  read_fn <- tryCatch(
+    get(".spi_read_metadata", mode = "function", inherits = TRUE),
+    error = function(e) NULL
+  )
+  if (is.null(read_fn)) return(NULL)
+  raw <- tryCatch(read_fn(), error = function(e) NULL)
+  if (!is.data.frame(raw) || nrow(raw) == 0L) return(NULL)
+  needed <- c(
+    "pillar", "pillar_name", "dimension", "dimension_name",
+    "indicator", "indicator_name", "indicator_id"
+  )
+  if (!all(needed %in% names(raw))) return(NULL)
+  ind <- raw[!is.na(raw[["indicator"]]) & nzchar(raw[["indicator"]]), ]
+  if (nrow(ind) == 0L) return(NULL)
+  indicators <- ind[c("pillar", "dimension", "indicator",
+    "indicator_name", "indicator_id")]
+  indicators <- indicators[!duplicated(indicators[["indicator_id"]]), ]
+  dim_rows <- raw[!is.na(raw[["dimension"]]) & nzchar(raw[["dimension"]]), ]
+  dimensions <- dim_rows[c("pillar", "dimension", "dimension_name")]
+  dimensions <- dimensions[!duplicated(dimensions[["dimension"]]), ]
+  pil_rows <- raw[!is.na(raw[["pillar"]]), ]
+  pillars <- pil_rows[c("pillar", "pillar_name")]
+  pillars <- pillars[!duplicated(pillars[["pillar"]]), ]
+  list(pillars = pillars, dimensions = dimensions, indicators = indicators)
+}
+
 spi_provider_snapshot <- function(
   year = NULL,
   preferred = "spiR",
@@ -163,6 +192,16 @@ spi_provider_snapshot <- function(
     provider_functions = provider_functions
   )
   index_call <- spi_provider_call(provider, "index", year = year)
+  if (!isTRUE(index_call$ok) && identical(provider$name, "spiR")) {
+    local_provider <- spi_provider_functions(
+      preferred = "local", root = root
+    )
+    local_index_call <- spi_provider_call(local_provider, "index", year = year)
+    if (isTRUE(local_index_call$ok)) {
+      provider <- local_provider
+      index_call <- local_index_call
+    }
+  }
   if (!isTRUE(index_call$ok)) {
     stop(index_call$error, call. = FALSE)
   }
@@ -245,6 +284,14 @@ spi_provider_snapshot <- function(
         hierarchy_call <- local_hierarchy_call
       }
     }
+    if (!isTRUE(hierarchy_call$ok)) {
+      raw_fallback <- spi_provider_raw_hierarchy()
+      if (!is.null(raw_fallback)) {
+        hierarchy_call <- list(
+          ok = TRUE, status = "ok", error = NULL, value = raw_fallback
+        )
+      }
+    }
     list(
       value = if (isTRUE(hierarchy_call$ok)) hierarchy_call$value else NULL,
       status = hierarchy_call[c("ok", "status", "error")]
@@ -263,6 +310,37 @@ spi_provider_snapshot <- function(
   dimension_labels <- spi_normalize_dimension_labels(hierarchy)
   pillar_labels <- spi_normalize_pillar_labels(hierarchy)
   indicator_labels <- spi_normalize_indicator_labels(hierarchy)
+  if (nrow(indicators) > 0L && nrow(indicator_labels) > 0L) {
+    indicator_labels <- spi_reconcile_indicator_labels(
+      unique(indicators$indicator_id), indicator_labels
+    )
+    matched <- match(indicators$indicator_id, indicator_labels$indicator_id)
+    has_label <- !is.na(matched)
+    if (any(has_label)) {
+      indicators$indicator_label[has_label] <-
+        indicator_labels$indicator_label[matched[has_label]]
+    }
+  }
+  if (nrow(indicators) > 0L && nrow(pillar_labels) > 0L) {
+    norm_ind <- sub("^D", "", indicators$pillar_id)
+    norm_lbl <- sub("^D", "", pillar_labels$pillar_id)
+    matched <- match(norm_ind, norm_lbl)
+    has_label <- !is.na(matched)
+    if (any(has_label)) {
+      indicators$pillar_label[has_label] <-
+        pillar_labels$pillar_label[matched[has_label]]
+    }
+  }
+  if (nrow(indicators) > 0L && nrow(dimension_labels) > 0L) {
+    norm_ind <- sub("^D", "", indicators$dimension_id)
+    norm_lbl <- sub("^D", "", dimension_labels$dimension_id)
+    matched <- match(norm_ind, norm_lbl)
+    has_label <- !is.na(matched)
+    if (any(has_label)) {
+      indicators$dimension_label[has_label] <-
+        dimension_labels$dimension_label[matched[has_label]]
+    }
+  }
   operation_status$hierarchy <- hierarchy_result$status
 
   income_data <- if (nrow(metadata) > 0L) {

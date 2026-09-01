@@ -2,7 +2,8 @@ country_profile_ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny::div(class = "spi-profile-controls",
-      shiny::selectInput(ns("profile_country"), "Country", choices = NULL),
+      shiny::selectInput(ns("profile_country"), "Country", choices = NULL,
+        multiple = TRUE),
       shiny::selectInput(ns("profile_year"), "Data year", choices = NULL)
     ),
     shiny::div(
@@ -28,6 +29,11 @@ country_profile_ui <- function(id) {
     ),
     shiny::div(class = "spi-profile-status",
       shiny::textOutput(ns("profile_overall_status"), inline = TRUE)
+    ),
+    shiny::div(class = "spi-profile-section spi-profile-context",
+      shiny::h2("Country context"),
+      shiny::p("Official SPI benchmarks for the selected year."),
+      DT::DTOutput(ns("profile_context"))
     ),
     shiny::div(class = "spi-profile-hero-grid",
       shiny::div(class = "spi-profile-section spi-profile-radar",
@@ -90,7 +96,7 @@ country_profile_server <- function(
 ) {
   shiny::moduleServer(id, function(input, output, session) {
     profile <- shiny::reactiveVal(NULL)
-    shiny::observeEvent(active(), {
+    shiny::observe({
       if (isTRUE(active()) && is.null(profile())) {
         profile(tryCatch(
           profile_loader(),
@@ -105,7 +111,7 @@ country_profile_server <- function(
           )
         ))
       }
-    }, ignoreInit = FALSE)
+    })
 
     profile_value <- shiny::reactive({
       value <- profile()
@@ -152,10 +158,18 @@ country_profile_server <- function(
       choices <- countries()
       requested <- input$profile_country
       if (length(choices) == 0L) return(NA_character_)
-      if (!is.null(requested) && requested %in% unname(choices)) {
-        return(as.character(requested))
+      requested <- as.character(requested)
+      requested <- requested[requested %in% unname(choices)]
+      if (length(requested) > 0L) {
+        return(requested[[1L]])
       }
       unname(choices[[1L]])
+    })
+
+    selected_countries <- shiny::reactive({
+      choices <- countries()
+      requested <- as.character(input$profile_country)
+      requested[requested %in% unname(choices)]
     })
 
     selected_overall <- shiny::reactive({
@@ -267,6 +281,37 @@ country_profile_server <- function(
       if (nrow(row) == 0L) return("-")
       spi_profile_format_value(row$score[[1L]])
     })
+    output$profile_context <- DT::renderDT({
+      data <- spi_profile_prepare_context(
+        profile_value()$overall$data,
+        profile_value()$radar_metadata,
+        profile_value()$benchmarks$data,
+        selected_country(), selected_year()
+      )
+      if (nrow(data) == 0L) {
+        return(DT::datatable(data.frame(), rownames = FALSE))
+      }
+      table <- data.frame(
+        Comparison = data$comparison,
+        Benchmark = data$benchmark,
+        Country = data$country_score,
+        Benchmark.score = data$benchmark_score,
+        Difference = data$difference,
+        stringsAsFactors = FALSE
+      )
+      DT::datatable(
+        table, rownames = FALSE,
+        colnames = c("Comparison", "Benchmark", "Country score", "Benchmark score", "Difference"),
+        class = "compact stripe spi-profile-score-table",
+        options = list(dom = "t", ordering = FALSE)
+      ) |>
+        DT::formatRound(columns = c("Country", "Benchmark.score", "Difference"), digits = 1) |>
+        DT::formatStyle(
+          columns = "Difference",
+          color = DT::styleInterval(c(0), c("#a12828", "#176b42")),
+          fontWeight = "700"
+        )
+    })
     output$profile_overall_status <- shiny::renderText(
       country_profile_section_message(section("overall"))
     )
@@ -367,12 +412,12 @@ country_profile_server <- function(
       } else {
         table <- value
       }
-      score_digits <- if (identical(section_name, "indicators")) 2L else 1L
-      score_breaks <- if (identical(section_name, "indicators")) {
-        c(0.4, 0.7)
-      } else {
-        c(40, 70)
-      }
+      score_values <- suppressWarnings(as.numeric(table$Score))
+      valid_scores <- score_values[!is.na(score_values) & score_values >= 0]
+      is_fractional <- length(valid_scores) > 0L &&
+        max(valid_scores) <= 1
+      score_digits <- if (is_fractional) 3L else 1L
+      score_breaks <- if (is_fractional) c(0.4, 0.7) else c(40, 70)
       result <- DT::datatable(
         table,
         rownames = FALSE,
@@ -410,6 +455,7 @@ country_profile_server <- function(
     list(
       profile = profile_value,
       selected_country = selected_country,
+      selected_countries = selected_countries,
       selected_year = selected_year,
       available_years = available_years
     )

@@ -5,6 +5,7 @@ testthat::test_that("app server accepts a fixture snapshot loader", {
     "mod_overview.R", "country_explorer_data.R",
     "country_explorer_helpers.R", "country_profile_data.R",
     "country_profile_helpers.R", "country_profile_visualizations.R",
+    "country_compare_helpers.R", "country_compare_data.R",
     "mod_country_explorer.R", "mod_country_compare.R",
     "mod_country_profile.R",
     "app_server.R")) {

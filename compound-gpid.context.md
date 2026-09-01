@@ -28,3 +28,8 @@ Milestone 2 Country Explorer: normalized country-level data, selectable shared y
 <!-- folder: wiki -->
 <!-- audience: developers -->
 <!-- tone: technical -->
+
+### Completed Milestone 3
+
+- Country Profile uses independent normalized section objects for header, overall series, pillars, dimensions, indicators, dimension extremes, and official-reference benchmarks. The module owns its country/year state and preserves explicit pending, partial, empty, unavailable, and error statuses.
+- The sibling `spiR` checkout is loaded with `devtools::load_all()` during development and verified before provider wiring. `spi_index()`, `spi_data()`, `country_info()`, `spi_aggregates()`, and `metadata()` provide the profile data; the external `spiR` repository remains untouched.

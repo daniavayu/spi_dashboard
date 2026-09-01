@@ -1,7 +1,9 @@
 app_server <- function(input, output, session, snapshot_loader = NULL) {
-  compare_countries <- shiny::reactiveVal(character())
+  compare_handoff <- shiny::reactiveVal(NULL)
+  detail_snapshot <- shiny::reactiveVal(NULL)
   overview_loader <- if (is.null(snapshot_loader)) {
     function() spi_provider_snapshot(
+      preferred = "local",
       load_details = FALSE,
       load_metadata = TRUE,
       load_aggregates = TRUE
@@ -10,11 +12,19 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
     snapshot_loader
   }
   explorer_loader <- if (is.null(snapshot_loader)) {
-    function() spi_provider_snapshot(
-      load_details = TRUE,
-      load_metadata = TRUE,
-      load_aggregates = FALSE
-    )
+    function() {
+      value <- detail_snapshot()
+      if (is.null(value)) {
+        value <- spi_provider_snapshot(
+          preferred = "local",
+          load_details = TRUE,
+          load_metadata = TRUE,
+          load_aggregates = TRUE
+        )
+        detail_snapshot(value)
+      }
+      value
+    }
   } else {
     snapshot_loader
   }
@@ -27,7 +37,7 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
     snapshot_loader = explorer_loader,
     active = function() identical(input$main_nav, "Country Explorer"),
     on_compare = function(countries) {
-      compare_countries(countries)
+      compare_handoff(countries)
       shiny::updateTabsetPanel(
         session, "main_nav", selected = "Compare Countries"
       )
@@ -36,15 +46,10 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
   country_compare_server(
     "country_compare",
     snapshot_loader = explorer_loader,
-    selected_countries = compare_countries,
-    selected_year = explorer$selected_year
+    handoff = compare_handoff
   )
   profile_loader <- if (is.null(snapshot_loader)) {
-    function() spi_profile_sections_from_snapshot(spi_provider_snapshot(
-      load_details = TRUE,
-      load_metadata = TRUE,
-      load_aggregates = TRUE
-    ))
+    function() spi_profile_sections_from_snapshot(explorer_loader())
   } else {
     function() spi_profile_sections_from_snapshot(snapshot_loader())
   }

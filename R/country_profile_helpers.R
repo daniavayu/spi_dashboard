@@ -161,3 +161,70 @@ spi_profile_prepare_benchmarks <- function(
     source = "spiR"
   )
 }
+
+spi_profile_prepare_context <- function(
+  overall, metadata, benchmarks, country_code, year
+) {
+  empty <- data.frame(
+    comparison = character(), benchmark = character(),
+    country_score = numeric(), benchmark_score = numeric(),
+    difference = numeric(), stringsAsFactors = FALSE
+  )
+  if (!is.data.frame(overall) || !is.data.frame(metadata) ||
+    !is.data.frame(benchmarks) || is.na(year)) return(empty)
+  country <- overall[
+    as.character(overall$country_code) == country_code &
+      as.integer(overall$year) == as.integer(year), , drop = FALSE
+  ]
+  info <- metadata[
+    as.character(metadata$country_code) == country_code &
+      as.integer(metadata$year) == as.integer(year), , drop = FALSE
+  ]
+  if (nrow(country) == 0L || nrow(info) == 0L) return(empty)
+  benchmark_rows <- benchmarks[
+    as.integer(benchmarks$year) == as.integer(year) &
+      as.character(benchmarks$source_id) == "SPI.INDEX", , drop = FALSE
+  ]
+  region <- as.character(info$region[[1L]])
+  income <- as.character(info$income_group[[1L]])
+  income_codes <- c(
+    "low income" = "LIC", "lower middle income" = "LMC",
+    "upper middle income" = "UMC", "high income" = "HIC"
+  )
+  rows <- list()
+  add_row <- function(comparison, benchmark_name, benchmark_code = NULL) {
+    matched <- if (!is.null(benchmark_code)) {
+      benchmark_rows[toupper(as.character(benchmark_rows$group_code)) ==
+        toupper(benchmark_code), , drop = FALSE]
+    } else {
+      benchmark_rows[tolower(trimws(as.character(benchmark_rows$group_name))) ==
+        tolower(trimws(benchmark_name)), , drop = FALSE]
+    }
+    if (nrow(matched) == 0L) return(NULL)
+    country_score <- suppressWarnings(as.numeric(country$score[[1L]]))
+    benchmark_score <- suppressWarnings(as.numeric(matched$score[[1L]]))
+    data.frame(
+      comparison = comparison, benchmark = benchmark_name,
+      country_score = country_score, benchmark_score = benchmark_score,
+      difference = country_score - benchmark_score,
+      stringsAsFactors = FALSE
+    )
+  }
+  if (!is.na(region) && nzchar(region)) {
+    rows[[length(rows) + 1L]] <- add_row("Region", region)
+  }
+  if (!is.na(income) && nzchar(income)) {
+    income_key <- tolower(trimws(income))
+    income_code <- if (income_key %in% names(income_codes)) {
+      unname(income_codes[[income_key]])
+    } else {
+      income
+    }
+    rows[[length(rows) + 1L]] <- add_row("Income group", income, income_code)
+  }
+  rows <- Filter(Negate(is.null), rows)
+  if (length(rows) == 0L) return(empty)
+  result <- do.call(rbind, rows)
+  rownames(result) <- NULL
+  result
+}

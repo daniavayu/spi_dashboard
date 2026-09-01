@@ -19,6 +19,7 @@ Suggests:
     dplyr,
     jsonlite,
     pkgload,
+    shinytest2,
     testthat,
     yaml
 Config/testthat/edition: 3

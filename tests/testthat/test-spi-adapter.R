@@ -1,4 +1,4 @@
-testthat::test_that("index normalization uses stable names and excludes missing scores", {
+testthat::test_that("index normalization uses stable names and preserves missing scores", {
   source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
   raw <- data.frame(
     iso3c = c("AAA", "BBB", "CCC"),
@@ -14,8 +14,26 @@ testthat::test_that("index normalization uses stable names and excludes missing 
     result,
     c("country_code", "country_name", "year", "score")
   )
-  testthat::expect_equal(result$country_code, "AAA")
-  testthat::expect_equal(result$score, 80)
+  testthat::expect_equal(result$country_code, c("AAA", "BBB"))
+  testthat::expect_equal(result$score, c(80, NA_real_))
+})
+
+testthat::test_that("country aliases use one canonical ISO3 code", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  raw <- data.frame(
+    iso3c = c("CHI", "CHL", "AAA"),
+    date = c(2024, 2024, 2024),
+    country = c("Chile", "Chile", "Alpha"),
+    `SPI.INDEX` = c(70, 71, 80),
+    `SPI.INDEX.PIL1` = c(70, 71, 80),
+    check.names = FALSE
+  )
+
+  result <- spi_normalize_index(raw, year = 2024)
+
+  testthat::expect_equal(sum(result$country_code == "CHL"), 1L)
+  testthat::expect_false("CHI" %in% result$country_code)
+  testthat::expect_equal(result$score[result$country_code == "CHL"], 71)
 })
 
 testthat::test_that("indicator normalization preserves partial rows", {
@@ -159,6 +177,55 @@ testthat::test_that("indicator normalization exposes stable pillar and dimension
   )
   testthat::expect_equal(result$pillar_id, "D1")
   testthat::expect_equal(result$dimension_id, "D1.1")
+})
+
+testthat::test_that("indicator labels use provider indicator IDs", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  hierarchy <- list(
+    indicators = data.frame(
+      indicator = "3.2.1",
+      indicator_id = "SPI.D3.2.HNGR",
+      indicator_name = "Indicator 3.2.1: Hunger prevalence",
+      stringsAsFactors = FALSE
+    )
+  )
+
+  result <- spi_normalize_indicator_labels(hierarchy)
+
+  testthat::expect_equal(result$indicator_id, "SPI.D3.2.HNGR")
+  testthat::expect_equal(
+    result$indicator_label,
+    "Indicator 3.2.1: Hunger prevalence"
+  )
+})
+
+testthat::test_that("reconciliation matches indicators by pillar and suffix", {
+  source(testthat::test_path("..", "..", "R", "spi_adapter.R"), local = TRUE)
+  labels <- data.frame(
+    indicator_id = c("SPI.D3.1.HNGR", "SPI.D3.1.HLTH", "SPI.D4.1.POPU"),
+    indicator_label = c("GOAL 2: Zero Hunger", "GOAL 3: Health", "Population census"),
+    stringsAsFactors = FALSE
+  )
+  data_ids <- c(
+    "SPI.D3.1.HNGR", "SPI.D3.2.HNGR", "SPI.D3.3.HLTH",
+    "SPI.D4.1.1.POPU", "SPI.D3.NA"
+  )
+
+  result <- spi_reconcile_indicator_labels(data_ids, labels)
+
+  testthat::expect_equal(
+    result$indicator_label[result$indicator_id == "SPI.D3.2.HNGR"],
+    "GOAL 2: Zero Hunger"
+  )
+  testthat::expect_equal(
+    result$indicator_label[result$indicator_id == "SPI.D3.3.HLTH"],
+    "GOAL 3: Health"
+  )
+  testthat::expect_equal(
+    result$indicator_label[result$indicator_id == "SPI.D4.1.1.POPU"],
+    "Population census"
+  )
+  testthat::expect_false("SPI.D3.NA" %in% result$indicator_id)
 })
 
 testthat::test_that("indicator normalization scales across multiple indicator columns", {

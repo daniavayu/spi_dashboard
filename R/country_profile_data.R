@@ -229,9 +229,8 @@ spi_profile_metric_rows <- function(data, columns, prefix, label_prefix) {
     metric_id <- sub("_score$", "", metric_id)
     metric_id <- gsub("_", ".", metric_id, fixed = TRUE)
     score <- suppressWarnings(as.numeric(data[[column]]))
-    if (identical(prefix, "dimension_") &&
-      any(!is.na(score)) && max(abs(score), na.rm = TRUE) <= 1) {
-      score <- score * 100
+    if (identical(prefix, "dimension_")) {
+      score[score < 0] <- NA_real_
     }
     data.frame(
       metric_id = metric_id,

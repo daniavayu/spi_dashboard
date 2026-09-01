@@ -105,9 +105,44 @@ spi_normalize_pillar_labels <- function(hierarchy) {
 }
 
 spi_normalize_indicator_labels <- function(hierarchy) {
-  spi_normalize_label_lookup(
-    hierarchy, "indicators", "indicator", "indicator_name"
+  result <- spi_normalize_label_lookup(
+    hierarchy, "indicators", "indicator_id", "indicator_name"
   )
+  names(result) <- c("indicator_id", "indicator_label")
+  result
+}
+
+# Extract the non-numeric abbreviation suffix from an SPI indicator ID.
+# SPI.D3.2.HNGR -> "3|HNGR", SPI.D4.1.1.POPU -> "4|POPU"
+spi_indicator_match_key <- function(ids) {
+  pillar <- sub("^SPI\\.D([0-9]+)\\..*", "\\1", ids)
+  suffix <- vapply(strsplit(ids, ".", fixed = TRUE), function(parts) {
+    if (length(parts) < 3L) return(paste(parts, collapse = "."))
+    rest <- parts[3:length(parts)]
+    while (length(rest) > 0L && grepl("^[0-9]+$", rest[1L])) {
+      rest <- rest[-1L]
+    }
+    if (length(rest) == 0L) return(paste(parts, collapse = "."))
+    paste(rest, collapse = ".")
+  }, character(1L))
+  paste(pillar, suffix, sep = "|")
+}
+
+spi_reconcile_indicator_labels <- function(data_ids, labels) {
+  if (nrow(labels) == 0L || length(data_ids) == 0L) return(labels)
+  unmatched <- setdiff(data_ids, labels$indicator_id)
+  if (length(unmatched) == 0L) return(labels)
+  meta_key <- spi_indicator_match_key(labels$indicator_id)
+  data_key <- spi_indicator_match_key(unmatched)
+  match_idx <- match(data_key, meta_key)
+  matched <- !is.na(match_idx)
+  if (!any(matched)) return(labels)
+  new_rows <- data.frame(
+    indicator_id = unmatched[matched],
+    indicator_label = labels$indicator_label[match_idx[matched]],
+    stringsAsFactors = FALSE
+  )
+  rbind(labels, new_rows)
 }
 
 #' Normalize a SPI metadata hierarchy into a dimension label lookup
@@ -140,6 +175,25 @@ spi_as_year <- function(value) {
   suppressWarnings(as.integer(as.character(value)))
 }
 
+spi_normalize_country_code <- function(value) {
+  codes <- toupper(trimws(as.character(value)))
+  codes[codes == "CHI"] <- "CHL"
+  codes
+}
+
+spi_deduplicate_country_year <- function(data) {
+  if (!is.data.frame(data) || nrow(data) == 0L ||
+    !all(c("country_code", "year") %in% names(data))) {
+    return(data)
+  }
+  completeness <- rowSums(!is.na(data))
+  keep <- order(data$country_code, data$year, -completeness)
+  data <- data[keep, , drop = FALSE]
+  data <- data[!duplicated(data[c("country_code", "year")]), , drop = FALSE]
+  rownames(data) <- NULL
+  data
+}
+
 spi_normalize_index <- function(data, year = NULL) {
   country_code_col <- spi_find_column(data, c("iso3c", "country_code", "Economy"))
   country_name_col <- spi_find_column(
@@ -151,7 +205,7 @@ spi_normalize_index <- function(data, year = NULL) {
   score_col <- spi_find_column(data, c("SPI.INDEX", "spi_index", "score"))
 
   result <- data.frame(
-    country_code = as.character(data[[country_code_col]]),
+    country_code = spi_normalize_country_code(data[[country_code_col]]),
     country_name = if (is.null(country_name_col)) {
       as.character(data[[country_code_col]])
     } else {
@@ -184,7 +238,12 @@ spi_normalize_index <- function(data, year = NULL) {
   if (!is.null(year)) {
     result <- result[result$year %in% spi_as_year(year), , drop = FALSE]
   }
-  result <- result[!is.na(result$score) & nzchar(result$country_code), , drop = FALSE]
+  result <- result[
+    !is.na(result$year) & nzchar(result$country_code),
+    ,
+    drop = FALSE
+  ]
+  result <- spi_deduplicate_country_year(result)
   rownames(result) <- NULL
   result
 }
@@ -221,7 +280,7 @@ spi_normalize_income_data <- function(index_data, metadata_data, year = NULL) {
   }
 
   result <- data.frame(
-    country_code = as.character(index_data[[index_code_col]]),
+    country_code = spi_normalize_country_code(index_data[[index_code_col]]),
     country_name = if (is.null(index_name_col)) {
       as.character(index_data[[index_code_col]])
     } else {
@@ -234,7 +293,7 @@ spi_normalize_income_data <- function(index_data, metadata_data, year = NULL) {
   )
 
   metadata_key <- paste(
-    as.character(metadata_data[[metadata_code_col]]),
+    spi_normalize_country_code(metadata_data[[metadata_code_col]]),
     spi_as_year(metadata_data[[metadata_year_col]]),
     sep = "_"
   )
@@ -256,6 +315,13 @@ spi_normalize_income_data <- function(index_data, metadata_data, year = NULL) {
   result
 }
 
+# Indicators without metadata or with no meaningful data
+spi_excluded_indicators <- c("SPI.D3.NA", "SPI.D4.3.GEO.second.admin.level")
+
+spi_exclude_indicators <- function(ids) {
+  ids[!ids %in% spi_excluded_indicators]
+}
+
 spi_normalize_indicators <- function(data) {
   if (!is.data.frame(data) || nrow(data) == 0L) {
     return(spi_empty_indicators())
@@ -268,6 +334,7 @@ spi_normalize_indicators <- function(data) {
   )
   year_col <- spi_find_column(data, c("date", "year", "Year"))
   score_cols <- grep("^SPI\\.D[0-9]+\\.", names(data), value = TRUE)
+  score_cols <- spi_exclude_indicators(score_cols)
   if (length(score_cols) == 0L) {
     return(spi_empty_indicators())
   }
@@ -305,9 +372,9 @@ spi_normalize_indicators <- function(data) {
     pillar_label = rep(pillar_ids, each = row_count),
     dimension_id = rep(dimension_ids, each = row_count),
     dimension_label = rep(dimension_ids, each = row_count),
-    country_code = rep(as.character(data[[country_code_col]]), times = indicator_count),
+    country_code = rep(spi_normalize_country_code(data[[country_code_col]]), times = indicator_count),
     country_name = rep(if (is.null(country_name_col)) {
-      as.character(data[[country_code_col]])
+      spi_normalize_country_code(data[[country_code_col]])
     } else {
       as.character(data[[country_name_col]])
     }, times = indicator_count),
@@ -338,9 +405,14 @@ spi_normalize_metadata <- function(data) {
     } else if (name == "year") {
       spi_as_year(data[[column]])
     } else {
-      as.character(data[[column]])
+      if (name == "country_code") {
+        spi_normalize_country_code(data[[column]])
+      } else {
+        as.character(data[[column]])
+      }
     }
   }
+  result <- spi_deduplicate_country_year(result)
   result
 }
 
@@ -352,7 +424,7 @@ spi_normalize_aggregates <- function(data, year = NULL) {
   value_col <- spi_find_column(data, c("value", "score"))
 
   result <- data.frame(
-    group_code = as.character(data[[code_col]]),
+    group_code = spi_normalize_country_code(data[[code_col]]),
     group_name = as.character(data[[name_col]]),
     year = spi_as_year(data[[year_col]]),
     source_id = as.character(data[[source_col]]),

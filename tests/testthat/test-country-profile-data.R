@@ -99,7 +99,7 @@ testthat::test_that("profile overall extracts dimension score columns from raw S
   testthat::expect_equal(normalized$data$dimension_1_5_score, 55)
 })
 
-testthat::test_that("profile dimension scores use the 0 to 100 scale", {
+testthat::test_that("profile dimension scores preserve the source scale", {
   source(testthat::test_path("..", "..", "R", "country_profile_data.R"),
     local = TRUE
   )
@@ -113,7 +113,22 @@ testthat::test_that("profile dimension scores use the 0 to 100 scale", {
     dimensions, "dimension_1_1_score", "dimension_", "Dimension"
   )
 
-  testthat::expect_equal(result$score, 70)
+  testthat::expect_equal(result$score, 0.7)
+})
+
+testthat::test_that("profile dimension missing scores do not become negative", {
+  source(testthat::test_path("..", "..", "R", "country_profile_data.R"), local = TRUE)
+
+  dimensions <- data.frame(
+    country_code = "AAA", country_name = "Alpha", year = 2024L,
+    dimension_1_1_score = -0.99, stringsAsFactors = FALSE
+  )
+
+  result <- spi_profile_metric_rows(
+    dimensions, "dimension_1_1_score", "dimension_", "Dimension"
+  )
+
+  testthat::expect_true(is.na(result$score))
 })
 
 testthat::test_that("dimension names resolve via the metadata lookup with a safe fallback", {

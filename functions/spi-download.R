@@ -1,7 +1,7 @@
 # Internal download engine for the SPI GitHub repository.
 # Not exported — called by spi_get() and spi_get_raw().
 
-SPI_GITHUB_BASE <- "https://raw.githubusercontent.com/worldbank/SPI"
+SPI_GITHUB_BASE <- "https://github.com/worldbank/SPI/raw/refs/heads"
 
 # Package-level in-session cache, keyed on "version|file_path".
 .spi_cache <- new.env(parent = emptyenv())
@@ -74,7 +74,9 @@ spi_download <- function(file_path, version = "master") {
   on.exit(unlink(tmp), add = TRUE)
 
   result <- tryCatch(
-    utils::download.file(url, destfile = tmp, quiet = TRUE, mode = "wb"),
+    utils::download.file(
+      url, destfile = tmp, quiet = TRUE, mode = "wb", method = "libcurl"
+    ),
     error = function(e) {
       cli::cli_abort(c(
         "Failed to download SPI data from GitHub.",

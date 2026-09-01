@@ -105,6 +105,45 @@ testthat::test_that("Explorer dimensions widen to one row per country-year", {
   testthat::expect_equal(wide[["Pillar 1"]], 72.1111)
 })
 
+testthat::test_that("Explorer indicators support all and multiple selections", {
+  source(testthat::test_path("..", "..", "R", "country_explorer_data.R"), local = TRUE)
+  source(testthat::test_path("..", "..", "R", "country_explorer_helpers.R"), local = TRUE)
+
+  snapshot <- list(
+    index = data.frame(
+      country_code = c("AAA", "BBB"), country_name = c("Alpha", "Beta"),
+      year = c(2024L, 2024L), score = c(70, 80), stringsAsFactors = FALSE
+    ),
+    indicators = data.frame(
+      indicator_id = c("I1", "I1", "I2", "I2"),
+      indicator_label = c("Indicator one", "Indicator one", "Indicator two", "Indicator two"),
+      country_code = c("AAA", "BBB", "AAA", "BBB"),
+      country_name = c("Alpha", "Beta", "Alpha", "Beta"),
+      year = rep(2024L, 4), score = c(0.7, 0.8, 0.4, 0.5),
+      stringsAsFactors = FALSE
+    ),
+    metadata = data.frame(
+      country_code = c("AAA", "BBB"), country_name = c("Alpha", "Beta"),
+      year = c(2024L, 2024L), region = c("R1", "R2"),
+      income_group = c("HIC", "MIC"), stringsAsFactors = FALSE
+    ),
+    operation_status = list()
+  )
+
+  all_rows <- spi_explorer_view(
+    snapshot, view = "indicators", indicator_id = "__all__", year = 2024L
+  )$data
+  selected_rows <- spi_explorer_view(
+    snapshot, view = "indicators", indicator_id = c("I1", "I2"),
+    year = 2024L
+  )$data
+
+  testthat::expect_equal(length(unique(all_rows$metric_id)), 2L)
+  testthat::expect_equal(length(unique(selected_rows$metric_id)), 2L)
+  wide <- spi_explorer_widen_metrics(selected_rows)
+  testthat::expect_true(all(c("Indicator one", "Indicator two") %in% names(wide)))
+})
+
 testthat::test_that("Explorer summary reports mean median and standard deviation", {
   source(testthat::test_path("..", "..", "R", "country_explorer_helpers.R"), local = TRUE)
 
