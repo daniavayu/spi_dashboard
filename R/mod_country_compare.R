@@ -19,11 +19,6 @@ country_compare_ui <- function(id) {
       shiny::div(class = "spi-card spi-panel", shiny::h3("Pillar comparison"), shiny::plotOutput(ns("compare_pillars"), height = "350px")),
       shiny::div(class = "spi-card spi-panel", shiny::h3("Trend"), shiny::plotOutput(ns("compare_plot"), height = "350px"))
     ),
-    shiny::div(class = "spi-card spi-panel spi-compare-benchmark",
-      shiny::h3("Country vs regional benchmark"),
-      shiny::p("Official regional SPI average for the selected year."),
-      shiny::plotOutput(ns("compare_benchmark"), height = "300px")
-    ),
     shiny::div(class = "spi-card spi-panel spi-compare-dimensions",
       shiny::h3("Largest dimension gaps"),
       shiny::uiOutput(ns("compare_dimensions"))
@@ -121,10 +116,6 @@ country_compare_server <- function(
     dimension_data <- shiny::reactive(spi_compare_dimension_gaps(
       snapshot()$index, countries(), year(), snapshot()$dimension_labels
     ))
-    benchmark_data <- shiny::reactive(spi_compare_region_benchmark(
-      snapshot()$index, snapshot()$metadata, snapshot()$aggregates,
-      countries(), year()
-    ))
 
     output$compare_pillars <- shiny::renderPlot({
       data <- pillar_data()$data
@@ -137,23 +128,6 @@ country_compare_server <- function(
       if (nrow(data) == 0L) return(plot.new())
       ggplot2::ggplot(data, ggplot2::aes(x = year, y = score, color = country_code, group = country_code)) +
         ggplot2::geom_line(na.rm = FALSE) + ggplot2::geom_point(na.rm = TRUE) + ggplot2::scale_y_continuous(limits = c(0, 100)) + ggplot2::theme_minimal()
-    })
-    output$compare_benchmark <- shiny::renderPlot({
-      data <- benchmark_data()
-      if (nrow(data) == 0L) {
-        plot.new()
-        text(0.5, 0.5, "Regional benchmark unavailable")
-        return(invisible(NULL))
-      }
-      ggplot2::ggplot(
-        data, ggplot2::aes(x = country_name, y = score, fill = type)
-      ) +
-        ggplot2::geom_col(position = "dodge", na.rm = FALSE) +
-        ggplot2::scale_y_continuous(limits = c(0, 100)) +
-        ggplot2::scale_fill_manual(values = c(Country = "#0b9ed0", Region = "#f39a38")) +
-        ggplot2::labs(x = NULL, y = "SPI score", fill = NULL) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 20, hjust = 1))
     })
     output$compare_dimensions <- shiny::renderUI({
       if (nrow(dimension_data()) == 0L) {

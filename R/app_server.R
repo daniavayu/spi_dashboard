@@ -3,7 +3,7 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
   detail_snapshot <- shiny::reactiveVal(NULL)
   overview_loader <- if (is.null(snapshot_loader)) {
     function() spi_provider_snapshot(
-      preferred = "local",
+      preferred = "spiR",
       load_details = FALSE,
       load_metadata = TRUE,
       load_aggregates = TRUE
@@ -16,7 +16,7 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
       value <- detail_snapshot()
       if (is.null(value)) {
         value <- spi_provider_snapshot(
-          preferred = "local",
+          preferred = "spiR",
           load_details = TRUE,
           load_metadata = TRUE,
           load_aggregates = TRUE

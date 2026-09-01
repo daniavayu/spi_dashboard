@@ -55,9 +55,10 @@ inventory covers visualizations only.
 | 2 | Country Profile | Row 1, left | Pillar Performance radar | `spi_profile_official_radar()` | `spiR::spi_plot_radar()` | Connected |
 | 1 | Trends & Progress | Row 1, full width | Regional history | `spi_plot_region_history()` | `spiR::spi_plot_regions()` | Partial |
 
-Country Explorer, Compare Countries, Explore by Pillar, and Data & Downloads
-do not currently contain a rendered visualization in the application. The
-Country Profile tables are also excluded from this chart inventory.
+Country Explorer, Explore by Pillar, and Data & Downloads do not currently
+contain a rendered visualization in the application. Compare Countries
+renders pillar and trend comparisons plus a dimension-gap table. The Country
+Profile tables are excluded from this chart inventory.
 
 The visualizations that are available in `spiR` but not currently displayed in
 the dashboard are `spi_plot_pillars()`,
@@ -103,6 +104,14 @@ A future Explorer chart could use `spi_plot_pillars()` for a selected country, b
 | Country versus region | Not currently shown as a separate chart | `spiR::spi_plot_country_vs_region(country, value_col)` | Available, not assigned |
 
 The Profile wrappers exist only to prioritize the official package function and retain a controlled fallback for offline fixtures. New Profile visualizations should follow the same pattern.
+
+### Compare Countries
+
+| Dashboard visual | Current implementation | Target `spiR` function | Status |
+|---|---|---|---|
+| Pillar comparison | Local comparison wrapper over the normalized snapshot | No direct equivalent | Dashboard-specific |
+| Overall trend | Local comparison wrapper over the normalized snapshot | `spiR::spi_plot_trend()` | Partial |
+| Largest dimension gaps | Local ranking over normalized dimension scores | No direct equivalent | Dashboard-specific |
 
 ### Future Dashboard Tabs
 

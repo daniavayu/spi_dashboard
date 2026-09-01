@@ -35,7 +35,8 @@ spi_empty_indicators <- function() {
 spi_empty_metadata <- function() {
   data.frame(
     country_code = character(), country_name = character(),
-    year = integer(), region = character(), income_group = character(),
+    year = integer(), region = character(), region_code = character(),
+    income_group = character(),
     stringsAsFactors = FALSE
   )
 }
@@ -195,6 +196,10 @@ spi_deduplicate_country_year <- function(data) {
 }
 
 spi_normalize_index <- function(data, year = NULL) {
+  exact_code <- toupper(trimws(as.character(data[[spi_find_column(
+    data, c("iso3c", "country_code", "Economy")
+  )]])))
+  data <- data[exact_code != "CHI" | !any(exact_code == "CHL"), , drop = FALSE]
   country_code_col <- spi_find_column(data, c("iso3c", "country_code", "Economy"))
   country_name_col <- spi_find_column(
     data,
@@ -388,10 +393,15 @@ spi_normalize_indicators <- function(data) {
 }
 
 spi_normalize_metadata <- function(data) {
+  exact_code <- toupper(trimws(as.character(data[[spi_find_column(
+    data, c("iso3c", "country_code")
+  )]])))
+  data <- data[exact_code != "CHI" | !any(exact_code == "CHL"), , drop = FALSE]
   aliases <- list(
     country_code = c("iso3c", "country_code"),
     country_name = c("country", "country_name"),
     region = c("region", "region_name"),
+    region_code = c("region_iso3c", "region_code"),
     income_group = c("income_level", "income_group"),
     year = c("date", "year", "Year")
   )

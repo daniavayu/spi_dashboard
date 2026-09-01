@@ -186,6 +186,11 @@ spi_profile_prepare_context <- function(
       as.character(benchmarks$source_id) == "SPI.INDEX", , drop = FALSE
   ]
   region <- as.character(info$region[[1L]])
+  region_code <- if ("region_code" %in% names(info)) {
+    as.character(info$region_code[[1L]])
+  } else {
+    NA_character_
+  }
   income <- as.character(info$income_group[[1L]])
   income_codes <- c(
     "low income" = "LIC", "lower middle income" = "LMC",
@@ -211,7 +216,12 @@ spi_profile_prepare_context <- function(
     )
   }
   if (!is.na(region) && nzchar(region)) {
-    rows[[length(rows) + 1L]] <- add_row("Region", region)
+    region_match <- if (!is.na(region_code) && nzchar(region_code)) {
+      add_row("Region", region, region_code)
+    } else {
+      add_row("Region", region)
+    }
+    rows[[length(rows) + 1L]] <- region_match
   }
   if (!is.na(income) && nzchar(income)) {
     income_key <- tolower(trimws(income))

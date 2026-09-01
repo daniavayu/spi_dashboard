@@ -158,6 +158,7 @@ spi_provider_raw_hierarchy <- function() {
   if (is.null(read_fn)) return(NULL)
   raw <- tryCatch(read_fn(), error = function(e) NULL)
   if (!is.data.frame(raw) || nrow(raw) == 0L) return(NULL)
+  raw <- as.data.frame(raw, stringsAsFactors = FALSE)
   needed <- c(
     "pillar", "pillar_name", "dimension", "dimension_name",
     "indicator", "indicator_name", "indicator_id"

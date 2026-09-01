@@ -16,9 +16,9 @@ package with `pkgload::load_all()` and then calls `spiDashboard::run_app()`.
 In RStudio, open `app.R` and use the blue Run App button. For deployment,
 use `rsconnect::deployApp()` after configuring the deployment account.
 
-The application is unauthenticated. Overview, Country Explorer, and the
-single-country Country Profile tabs are available in the current milestones;
-later dashboard tabs remain outside the implemented scope.
+The application is unauthenticated. Overview, Country Explorer, Country
+Profile, and Compare Countries are available in the current milestone; the
+remaining navigation tabs are placeholders or partial visualizations.
 
 ## Country Explorer
 
@@ -54,8 +54,11 @@ with the local functions as fallback. The dashboard does not call raw provider
 functions from UI modules, and it does not modify the external `spiR`
 repository.
 
-Country comparison, Explorer handoff, downloads, rankings, weighting, new
-maps, and production deployment are excluded.
+Compare Countries owns its country/year controls and renders pillar, trend,
+and largest-dimension-gap comparisons. It uses the same normalized snapshot
+as Country Explorer and Country Profile, so a new `spiR` release is picked up
+when the app starts again. Production deployment remains outside the current
+milestone.
 
 ## Data provider
 
@@ -63,6 +66,11 @@ The application prefers the `spiR` package and keeps the local functions in
 `functions/` as an explicit fallback. Provider selection and schema
 normalization are isolated under `R/` so Shiny modules do not interpret
 upstream column names directly.
+
+To update the dashboard data, update the installed or development `spiR`
+package, restart the application, and run the focused tests. The dashboard
+does not copy SPI data into the repository. The local provider is used only
+when the `spiR` provider cannot load the mandatory index.
 
 The complete function-to-visualization mapping, including functions already
 connected, dashboard-only charts, and remaining migration work, is documented
