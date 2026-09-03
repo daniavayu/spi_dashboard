@@ -14,6 +14,28 @@ testthat::test_that("comparison index preserves keyed rows with missing overall 
   testthat::expect_equal(result$score, c(80, NA_real_))
 })
 
+testthat::test_that("comparison trends begin at each country's first valid score", {
+  root <- normalizePath(testthat::test_path("..", ".."))
+  env <- new.env(parent = globalenv())
+  sys.source(file.path(root, "R", "country_compare_helpers.R"), envir = env)
+  sys.source(file.path(root, "R", "country_compare_data.R"), envir = env)
+
+  index <- data.frame(
+    country_code = c("ABW", "ABW", "ABW", "AAA", "AAA", "AAA"),
+    country_name = c("Aruba", "Aruba", "Aruba", "Alpha", "Alpha", "Alpha"),
+    year = c(2022L, 2023L, 2024L, 2022L, 2023L, 2024L),
+    score = c(NA_real_, NA_real_, 40, 60, 61, 62),
+    stringsAsFactors = FALSE
+  )
+
+  result <- env$spi_compare_trends(index, c("ABW", "AAA"))$data
+  aruba <- result[result$country_code == "ABW", , drop = FALSE]
+
+  testthat::expect_equal(aruba$year, 2024L)
+  testthat::expect_equal(aruba$score, 40)
+  testthat::expect_equal(result[result$country_code == "AAA", "year"], 2022:2024)
+})
+
 testthat::test_that("comparison dimensions are reshaped from normalized index columns", {
   root <- normalizePath(testthat::test_path("..", ".."))
   env <- new.env(parent = globalenv())

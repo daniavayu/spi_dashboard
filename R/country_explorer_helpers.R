@@ -1,3 +1,46 @@
+spi_explorer_normalize_text <- function(value) {
+  value <- as.character(value)
+  value <- trimws(value)
+  value <- iconv(value, to = "ASCII//TRANSLIT", sub = "")
+  value <- tolower(value)
+  value <- gsub("[[:space:]]+", " ", value)
+  value <- gsub("[-_]+", " ", value)
+  value
+}
+
+spi_explorer_country_match <- function(search_terms, country_names, country_codes) {
+  if (length(search_terms) == 0L) return(rep(FALSE, length(country_names)))
+  normalized_names <- spi_explorer_normalize_text(country_names)
+  normalized_codes <- spi_explorer_normalize_text(country_codes)
+  matches <- rep(FALSE, length(country_names))
+  for (term in search_terms) {
+    term <- spi_explorer_normalize_text(term)
+    if (!nzchar(term)) next
+
+    exact <- which(normalized_codes == term | normalized_names == term)
+    if (length(exact) > 0L) {
+      matches[exact] <- TRUE
+      next
+    }
+
+    substring <- which(grepl(term, normalized_names, fixed = TRUE) |
+      grepl(term, normalized_codes, fixed = TRUE))
+    if (length(substring) > 0L) {
+      matches[substring] <- TRUE
+      next
+    }
+
+    fuzzy <- unique(c(
+      agrep(term, normalized_names, max.distance = 0.12, ignore.case = TRUE),
+      agrep(term, normalized_codes, max.distance = 0.12, ignore.case = TRUE)
+    ))
+    if (length(fuzzy) > 0L) {
+      matches[fuzzy] <- TRUE
+    }
+  }
+  matches
+}
+
 spi_explorer_filter <- function(
   snapshot,
   year = NULL,
@@ -28,13 +71,9 @@ spi_explorer_filter <- function(
   }
   if (length(search_countries) > 0L) {
     country_codes <- as.character(result$country_code)
-    if (all(search_countries %in% country_codes)) {
-      result <- result[country_codes %in% search_countries, , drop = FALSE]
-    } else {
-      pattern <- paste(tolower(search_countries), collapse = "|")
-      matches <- grepl(pattern, tolower(result$country_name))
-      result <- result[!is.na(matches) & matches, , drop = FALSE]
-    }
+    country_names <- as.character(result$country_name)
+    matched <- spi_explorer_country_match(search_countries, country_names, country_codes)
+    result <- result[matched, , drop = FALSE]
   } else {
     if (!is.null(region) && nzchar(region)) {
       result <- result[

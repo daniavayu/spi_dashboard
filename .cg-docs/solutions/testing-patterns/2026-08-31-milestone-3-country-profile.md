@@ -113,6 +113,7 @@ The completed execution report recorded:
 - `.cg-docs/brainstorms/2026-08-20-milestone-3-country-profile.md`
 - `.cg-docs/work-reports/2026-08-20-milestone-3-country-profile-revised.md`
 - `.cg-docs/solutions/testing-patterns/2026-08-20-milestone-2-country-explorer.md`
+- `.cg-docs/solutions/testing-patterns/2026-09-01-milestone-4-country-comparison.md`
 - `R/spi_provider.R`
 - `R/spi_adapter.R`
 - `R/country_profile_data.R`

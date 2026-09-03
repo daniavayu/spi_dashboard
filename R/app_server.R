@@ -58,6 +58,10 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
     profile_loader = profile_loader,
     active = function() identical(input$main_nav, "Country Profile")
   )
+  trends_progress_server(
+    "trends_progress",
+    snapshot_loader = explorer_loader
+  )
 
   output$overview_flourish_map <- shiny::renderUI({
     regions <- prepare_flourish_regions(overview$snapshot()$index)
@@ -112,10 +116,6 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
       ),
       collapse = " | "
     )
-  })
-
-  output$overview_region_history <- shiny::renderPlot({
-    spi_plot_region_history()
   })
 
   output$kpi_countries <- shiny::renderText({

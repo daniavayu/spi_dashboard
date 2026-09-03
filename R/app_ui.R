@@ -206,7 +206,7 @@ app_ui <- function(request = NULL) {
           country_compare_ui("country_compare")
         ),
         shiny::tabPanel("Trends & Progress",
-          shiny::div(class = "spi-card spi-panel", shiny::h2("Trends & Progress"), shiny::p("Regional trends from the official spiR visualization functions."), shiny::plotOutput("overview_region_history", height = "520px"))),
+          trends_progress_ui("trends_progress")),
         shiny::tabPanel("Explore by Pillar",
           shiny::div(class = "spi-placeholder", shiny::div(shiny::h2("Explore by Pillar"), shiny::p("Pillar and dimension exploration will be available in a future iteration.")))
         ),

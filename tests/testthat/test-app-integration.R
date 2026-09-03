@@ -6,7 +6,8 @@ testthat::test_that("app server accepts a fixture snapshot loader", {
     "country_explorer_helpers.R", "country_profile_data.R",
     "country_profile_helpers.R", "country_profile_visualizations.R",
     "country_compare_helpers.R", "country_compare_data.R",
-    "mod_country_explorer.R", "mod_country_compare.R",
+    "mod_country_explorer.R", "mod_country_compare.R", "trends_progress_data.R",
+    "mod_trends_progress.R",
     "mod_country_profile.R",
     "app_server.R")) {
     sys.source(file.path(root, "R", file), envir = env)

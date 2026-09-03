@@ -141,19 +141,29 @@ country_explorer_server <- function(
       )
     })
     output$explorer_country_ui <- shiny::renderUI({
-      choices <- country_choices()
-      shiny::selectInput(
-        session$ns("explorer_country"), "Country",
-        choices = c("Search country" = "", choices),
-        selected = ""
+      shiny::textInput(
+        session$ns("explorer_country"),
+        "Country",
+        value = "",
+        placeholder = "Type country name or code"
       )
     })
 
     shiny::observeEvent(input$explorer_country, {
-      countries <- as.character(input$explorer_country)
-      countries <- countries[!is.na(countries) & nzchar(countries)]
-      if (length(countries) > 0L) {
-        searched_countries(unique(c(searched_countries(), countries)))
+      country_value <- as.character(input$explorer_country)
+      country_value <- trimws(country_value)
+      if (!nzchar(country_value)) {
+        searched_countries(character())
+        return()
+      }
+      valid_codes <- country_choices()
+      valid_names <- tolower(as.character(names(valid_codes)))
+      if (country_value %in% valid_codes ||
+          tolower(country_value) %in% valid_names ||
+          tolower(country_value) %in% tolower(spi_explorer_normalize_text(names(valid_codes)))) {
+        searched_countries(unique(c(searched_countries(), country_value)))
+      } else {
+        searched_countries(character())
       }
     }, ignoreInit = TRUE)
 
@@ -171,9 +181,10 @@ country_explorer_server <- function(
       shiny::updateSelectInput(
         session, "explorer_indicator", selected = "__all__"
       )
-      shiny::updateSelectInput(
-        session, "explorer_country", selected = ""
+      shiny::updateTextInput(
+        session, "explorer_country", value = ""
       )
+      searched_countries(character())
     })
 
     selected_year <- shiny::reactive({
@@ -193,13 +204,22 @@ country_explorer_server <- function(
       } else {
         input$explorer_view
       }
+      country_filter <- if (is.null(input$explorer_country)) {
+        NULL
+      } else {
+        as.character(input$explorer_country)
+      }
+      country_filter <- country_filter[
+        !is.na(country_filter) & nzchar(country_filter) &
+          country_filter != ""
+      ]
       spi_explorer_view(
         snapshot_value(),
         view = selected_view,
         year = selected_year(),
         region = input$explorer_region,
         income_group = input$explorer_income,
-        country_search = NULL,
+        country_search = if (length(country_filter) == 0L) NULL else country_filter,
         indicator_id = input$explorer_indicator,
         selected_countries = unique(c(
           selected_countries(), searched_countries()

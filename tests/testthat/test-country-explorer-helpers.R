@@ -1,3 +1,64 @@
+testthat::test_that("Explorer filters a selected country and preserves the reset state", {
+  source(testthat::test_path("..", "..", "R", "country_explorer_data.R"), local = TRUE)
+  source(testthat::test_path("..", "..", "R", "country_explorer_helpers.R"), local = TRUE)
+
+  snapshot <- list(
+    index = data.frame(
+      country_code = c("AAA", "AAA", "BBB", "CCC"),
+      country_name = c("Alpha", "Alpha", "Beta", "Gamma"),
+      year = c(2023L, 2024L, 2024L, 2024L),
+      score = c(60, 70, 80, 85),
+      pillar_1_score = c(61, 71, 81, 86),
+      stringsAsFactors = FALSE
+    ),
+    metadata = data.frame(
+      country_code = c("AAA", "BBB", "CCC"),
+      country_name = c("Alpha", "Beta", "Gamma"),
+      year = c(2024L, 2024L, 2024L),
+      region = c("Region A", "Region B", "Region A"),
+      income_group = c("HIC", "MIC", "HIC"),
+      stringsAsFactors = FALSE
+    ),
+    indicators = data.frame(),
+    operation_status = list()
+  )
+
+  filtered <- spi_explorer_filter(snapshot, year = 2024L, country_search = c("BBB", "beta"))
+  testthat::expect_equal(filtered$data$country_code, "BBB")
+
+  accented <- spi_explorer_filter(snapshot, year = 2024L, country_search = "curazao")
+  testthat::expect_equal(accented$data$country_code, character(0))
+
+  fuzzy <- data.frame(
+    country_code = c("CUW", "USA"),
+    country_name = c("Curaçao", "United States"),
+    year = c(2024L, 2024L),
+    score = c(50, 60),
+    stringsAsFactors = FALSE
+  )
+  result_fuzzy <- spi_explorer_filter(
+    list(
+      index = fuzzy,
+      metadata = data.frame(
+        country_code = c("CUW", "USA"),
+        country_name = c("Curaçao", "United States"),
+        year = c(2024L, 2024L),
+        region = c("Americas", "Americas"),
+        income_group = c("HIC", "HIC"),
+        stringsAsFactors = FALSE
+      ),
+      indicators = data.frame(),
+      operation_status = list()
+    ),
+    year = 2024L,
+    country_search = "curazao"
+  )
+  testthat::expect_equal(result_fuzzy$data$country_code, "CUW")
+
+  result <- spi_explorer_filter(snapshot, year = 2024L, region = "Region A")
+  testthat::expect_equal(sort(result$data$country_code), c("AAA", "CCC"))
+})
+
 testthat::test_that("Explorer filters and resets from an all-years snapshot", {
   source(testthat::test_path("..", "..", "R", "country_explorer_data.R"), local = TRUE)
   source(testthat::test_path("..", "..", "R", "country_explorer_helpers.R"), local = TRUE)

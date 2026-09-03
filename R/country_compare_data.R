@@ -259,6 +259,11 @@ spi_compare_trends <- function(index, countries, metric = "overall") {
     })
   })
   result <- do.call(rbind, unlist(rows, recursive = FALSE))
+  result <- do.call(rbind, lapply(split(result, result$country_code), function(country_data) {
+    valid_rows <- which(!is.na(country_data$score))
+    if (!length(valid_rows)) return(country_data[0, , drop = FALSE])
+    country_data[seq.int(valid_rows[[1L]], nrow(country_data)), , drop = FALSE]
+  }))
   rownames(result) <- NULL
   status <- if (all(!is.na(result$score))) "ok" else "partial"
   spi_compare_section_result(result, status,

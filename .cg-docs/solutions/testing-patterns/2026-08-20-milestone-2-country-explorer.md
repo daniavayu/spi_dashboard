@@ -76,6 +76,7 @@ The completed execution report recorded:
 - `.cg-docs/plans/2026-08-13-milestone-2-country-explorer-final.md`
 - `.cg-docs/work-reports/2026-08-13-milestone-2-country-explorer-final.md`
 - `.cg-docs/solutions/bugs/2026-08-12-milestone-1-overview-implementation.md`
+- `.cg-docs/solutions/testing-patterns/2026-09-01-milestone-4-country-comparison.md`
 - `README.md`
 - `R/spi_provider.R`
 - `R/spi_adapter.R`

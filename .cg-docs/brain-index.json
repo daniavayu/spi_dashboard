@@ -1,10 +1,34 @@
 {
-  "edge_count": 1,
+  "edge_count": 5,
   "edges": [
     {
       "edge_type": "references",
       "source": ".cg-docs/brainstorms/2026-08-12-milestone-2-country-explorer.md",
       "target": ".cg-docs/plans/2026-08-12-milestone-2-country-explorer.md",
+      "target_missing": false
+    },
+    {
+      "edge_type": "references",
+      "source": ".cg-docs/brainstorms/2026-08-20-milestone-3-country-profile.md",
+      "target": ".cg-docs/plans/2026-08-20-milestone-3-country-profile.md",
+      "target_missing": false
+    },
+    {
+      "edge_type": "references",
+      "source": ".cg-docs/brainstorms/2026-08-31-milestone-4-country-comparison.md",
+      "target": ".cg-docs/plans/2026-08-31-milestone-4-country-comparison.md",
+      "target_missing": false
+    },
+    {
+      "edge_type": "implements",
+      "source": ".cg-docs/plans/2026-08-20-milestone-3-country-profile-revised.md",
+      "target": "roadmap.json#milestone-3-modular-single-country-country-profile",
+      "target_missing": false
+    },
+    {
+      "edge_type": "implements",
+      "source": ".cg-docs/plans/2026-08-20-milestone-3-country-profile.md",
+      "target": "roadmap.json#milestone-3-modular-single-country-country-profile",
       "target_missing": false
     }
   ],
@@ -71,6 +95,74 @@
         "country_explorer_helpers.r",
         "r/spi_provider.r",
         "r/spi_adapter.r"
+      ]
+    },
+    {
+      "date": "2026-08-20",
+      "entity_type": "brainstorm",
+      "path": ".cg-docs/brainstorms/2026-08-20-milestone-3-country-profile.md",
+      "slug": "2026-08-20-milestone-3-country-profile",
+      "status": "decided",
+      "summary": "Milestones 1 and 2 established the Golem-compatible SPI dashboard, the provider and normalization boundary, Overview, and Country Explorer. The next milestone is Country Profile: a zoomed-in analytical view of one country. The profile should reuse the normalized provider contract and the functions from `spiR` through the dashboard adapter, while keeping each visualization independent from the other sections on the page.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-profile",
+        "spiR",
+        "modular-visualizations",
+        "country-explorer",
+        "navigation",
+        "trends",
+        "pillars",
+        "dimensions",
+        "indicators",
+        "peers"
+      ],
+      "title": "Milestone 3: Single-country Country Profile",
+      "top_keywords": [
+        "country profile",
+        "spir",
+        "country explorer",
+        "profile",
+        "approach",
+        "country",
+        "single-country",
+        "r/spi_provider.r",
+        "r/spi_adapter.r",
+        "milestone"
+      ]
+    },
+    {
+      "date": "2026-08-31",
+      "entity_type": "brainstorm",
+      "path": ".cg-docs/brainstorms/2026-08-31-milestone-4-country-comparison.md",
+      "slug": "2026-08-31-milestone-4-country-comparison",
+      "status": "decided",
+      "summary": "Milestones 1, 2, and 3 established the Golem-compatible dashboard, the provider and normalization boundary, Country Explorer, and the modular single-country Country Profile. The next milestone is a dedicated comparison workspace for users who need to examine several countries side by side.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-comparison",
+        "spiR",
+        "reproducibility",
+        "pillars",
+        "dimensions",
+        "trends"
+      ],
+      "title": "Milestone 4: Country Comparison",
+      "top_keywords": [
+        "spir",
+        "compare countries",
+        "country explorer",
+        "comparison",
+        "milestone",
+        "views",
+        "direction",
+        "metadata()",
+        "r/mod_country_compare.r",
+        "country comparison"
       ]
     },
     {
@@ -172,33 +264,35 @@
       "entity_type": "plan",
       "path": ".cg-docs/plans/2026-08-13-milestone-2-country-explorer-final.md",
       "slug": "2026-08-13-milestone-2-country-explorer-final",
-      "status": "completed",
+      "status": "in-progress",
       "summary": "Implement Country Explorer as an independent Golem module for browsing and filtering country-level SPI data. The module will provide Pillars as the default view and Dimensions and Indicators as alternatives, while keeping provider interpretation outside the Shiny UI layer.",
       "tags": [
         "spi",
         "shiny",
         "golem",
         "country-explorer",
+        "compare-countries",
         "spiR",
         "filters",
         "table",
         "pillars",
         "dimensions",
         "indicators",
-        "year-selector"
+        "year-selector",
+        "multi-selection"
       ],
       "title": "Milestone 2: Country Explorer (Final Plan)",
       "top_keywords": [
         "country explorer",
         "spir",
+        "compare countries",
         "fragile/conflict",
         "spi_data()",
         "country profile",
         "test scenarios",
         "test-spi-provider.r",
         "imports",
-        "test-spi-adapter.r",
-        "na"
+        "test-spi-adapter.r"
       ]
     },
     {
@@ -233,6 +327,151 @@
         "test scenarios",
         "country",
         "explorer"
+      ]
+    },
+    {
+      "date": "2026-08-20",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-20-milestone-3-country-profile-revised.md",
+      "slug": "2026-08-20-milestone-3-country-profile-revised",
+      "status": "completed",
+      "summary": "Implement Country Profile as an independent Golem-compatible view for one country. The user selects the country directly in Country Profile; Country Explorer does not select a country for Profile and has no handoff contract. Profile owns its country and year state and keeps Overview and Country Explorer state unchanged. Country comparison, downloads, weighting, and new maps remain out of scope.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-profile",
+        "spiR",
+        "provider-adapter",
+        "navigation",
+        "modular-visualizations",
+        "trends",
+        "pillars",
+        "dimensions",
+        "indicators",
+        "benchmarks",
+        "testing",
+        "revised"
+      ],
+      "title": "Milestone 3: Modular single-country Country Profile (Revised)",
+      "top_keywords": [
+        "spir",
+        "country profile",
+        "country explorer",
+        "na",
+        "phase",
+        "country",
+        "profile",
+        "test-country-profile-helpers.r",
+        "unavailable",
+        "verification"
+      ]
+    },
+    {
+      "date": "2026-08-20",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-20-milestone-3-country-profile.md",
+      "slug": "2026-08-20-milestone-3-country-profile",
+      "status": "active",
+      "summary": "Implement Country Profile as a Golem-compatible, single-country analytical surface. A user selects a country directly from the Country Profile tab. The profile owns its country and year state, reuses the existing `spiR` provider/fallback boundary, and renders score, trend, pillar, dimension, indicator, strength/improvement, and benchmark sections independently.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-profile",
+        "spiR",
+        "provider-adapter",
+        "navigation",
+        "modular-visualizations",
+        "trends",
+        "pillars",
+        "dimensions",
+        "indicators",
+        "benchmarks",
+        "testing",
+        "revised"
+      ],
+      "title": "Milestone 3: Modular single-country Country Profile (Revised)",
+      "top_keywords": [
+        "spir",
+        "country profile",
+        "country explorer",
+        "unavailable",
+        "test scenarios",
+        "empty",
+        "profile",
+        "spi_index()",
+        "country",
+        "phase"
+      ]
+    },
+    {
+      "date": "2026-08-31",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-31-milestone-4-country-comparison-revised.md",
+      "slug": "2026-08-31-milestone-4-country-comparison-revised",
+      "status": "active",
+      "summary": "Implement Compare Countries as an independent Golem module and application tab inside the existing Shiny application. It will support descriptive comparison of two or three countries using selected-year pillar views, all-years trends, and a dimension-level table.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-comparison",
+        "spiR",
+        "provider-adapter",
+        "missing-data",
+        "dimensions",
+        "trends",
+        "testing",
+        "revised"
+      ],
+      "title": "Milestone 4: Country Comparison (Revised)",
+      "top_keywords": [
+        "na",
+        "spir",
+        "unavailable",
+        "partial",
+        "phase",
+        "policy",
+        "comparison",
+        "dimensions",
+        "year",
+        "coverage"
+      ]
+    },
+    {
+      "date": "2026-08-31",
+      "entity_type": "plan",
+      "path": ".cg-docs/plans/2026-08-31-milestone-4-country-comparison.md",
+      "slug": "2026-08-31-milestone-4-country-comparison",
+      "status": "approved",
+      "summary": "Implement Compare Countries as an independent Golem workspace for descriptive, side-by-side comparison of up to three countries. The workspace will combine selected-year pillar views, an all-years trend view, and a dimension-level table while preserving the existing provider, adapter, fallback, and module boundaries established by Milestones 1-3.",
+      "tags": [
+        "spi",
+        "shiny",
+        "golem",
+        "country-comparison",
+        "spiR",
+        "provider-adapter",
+        "navigation",
+        "radar",
+        "pillars",
+        "dimensions",
+        "trends",
+        "testing"
+      ],
+      "title": "Milestone 4: Country Comparison",
+      "top_keywords": [
+        "spir",
+        "comparison",
+        "phase",
+        "test-country-compare-data.r",
+        "test-country-compare-helpers.r",
+        "contract",
+        "na",
+        "r/mod_country_compare.r",
+        "test-country-compare-module.r",
+        "test-app-integration.r"
       ]
     },
     {
@@ -329,34 +568,130 @@
         "country",
         "explorer"
       ]
+    },
+    {
+      "date": "2026-08-31",
+      "entity_type": "solution",
+      "path": ".cg-docs/solutions/testing-patterns/2026-08-31-milestone-3-country-profile.md",
+      "slug": "2026-08-31-milestone-3-country-profile",
+      "status": "",
+      "summary": "Milestone 3 required a modular Country Profile for one country. The page had to show the overall score, pillar performance, score over time, dimensions, indicators, highest and lowest observed dimensions, and regional or income reference values. It also needed independent country and year controls, explicit missing and partial-data behavior, and deterministic tests while using the development checkout of `spiR` as the preferred provider. The profile could not depend on Country Explorer state or assume that every optional provider operation would return complete data.",
+      "tags": [
+        "milestone-3",
+        "country-profile",
+        "shiny",
+        "golem",
+        "spiR",
+        "provider-adapter",
+        "normalized-data",
+        "fixtures",
+        "benchmarks",
+        "missing-data",
+        "modularity"
+      ],
+      "title": "Milestone 3 Country Profile with independent normalized sections",
+      "top_keywords": [
+        "spir",
+        "country profile",
+        "r/spi_provider.r",
+        "normalized",
+        "r/country_profile_data.r",
+        "r/mod_country_profile.r",
+        "r/country_profile_visualizations.r",
+        "r/spi_adapter.r",
+        "spi_provider.r",
+        "country explorer"
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "entity_type": "solution",
+      "path": ".cg-docs/solutions/testing-patterns/2026-09-01-milestone-4-country-comparison.md",
+      "slug": "2026-09-01-milestone-4-country-comparison",
+      "status": "",
+      "summary": "Milestone 4 added a Country Comparison workspace to the SPI dashboard. Users needed to compare two or three countries across a selected year, inspect pillar scores and dimension gaps, and view overall trends over time. The feature had to preserve the Golem-compatible structure, use the separate `spiR` package as the source of data, remain reproducible as new data are released, and avoid turning a descriptive comparison into a causal ranking. The dashboard also needed to remove a regional benchmark panel whose behavior was no longer part of the approved comparison workflow, while preserving the Country Profile context benchmarks.",
+      "tags": [
+        "milestone-4",
+        "country-comparison",
+        "shiny",
+        "golem",
+        "spiR",
+        "provider-adapter",
+        "normalized-data",
+        "fixture-injection",
+        "reproducibility"
+      ],
+      "title": "Milestone 4 Country Comparison with a modular spiR-backed workflow",
+      "top_keywords": [
+        "spir",
+        "country comparison",
+        "data.table",
+        "r/spi_provider.r",
+        "r/mod_country_compare.r",
+        "r/app_server.r",
+        "data.frame",
+        "r/spi_adapter.r",
+        "spi_provider.r",
+        "country profile"
+      ]
+    },
+    {
+      "date": "",
+      "entity_type": "feature",
+      "path": "roadmap.json#milestone-3-modular-single-country-country-profile",
+      "slug": "milestone-3-modular-single-country-country-profile",
+      "status": "done",
+      "summary": "Milestone 3: Modular single-country Country Profile",
+      "tags": [],
+      "title": "Milestone 3: Modular single-country Country Profile",
+      "top_keywords": [
+        "country profile\nmilestone",
+        "country profile\nobjective",
+        "country profile",
+        "country",
+        "profile",
+        "milestone",
+        "modular",
+        "single-country",
+        "feature",
+        "objective"
+      ]
     }
   ],
-  "entity_count": 10,
-  "generated": "2026-08-20",
+  "entity_count": 19,
+  "generated": "2026-09-01",
   "schema_version": "0.2.0",
   "topic_count": 1,
   "topics": [
     {
-      "entity_count": 10,
+      "entity_count": 18,
       "entity_paths": [
         ".cg-docs/brainstorms/2026-08-06-spi-shiny-dashboard.md",
         ".cg-docs/brainstorms/2026-08-12-milestone-2-country-explorer.md",
+        ".cg-docs/brainstorms/2026-08-20-milestone-3-country-profile.md",
+        ".cg-docs/brainstorms/2026-08-31-milestone-4-country-comparison.md",
         ".cg-docs/plans/2026-08-06-milestone-1-repository-overview-refined.md",
         ".cg-docs/plans/2026-08-06-milestone-1-repository-overview.md",
         ".cg-docs/plans/2026-08-12-milestone-2-country-explorer.md",
         ".cg-docs/plans/2026-08-13-milestone-2-country-explorer-final.md",
         ".cg-docs/plans/2026-08-13-milestone-2-country-explorer-revised.md",
+        ".cg-docs/plans/2026-08-20-milestone-3-country-profile-revised.md",
+        ".cg-docs/plans/2026-08-20-milestone-3-country-profile.md",
+        ".cg-docs/plans/2026-08-31-milestone-4-country-comparison-revised.md",
+        ".cg-docs/plans/2026-08-31-milestone-4-country-comparison.md",
         ".cg-docs/solutions/bugs/2026-08-12-milestone-1-overview-implementation.md",
         ".cg-docs/solutions/bugs/2026-08-12-spi-region-visualization.md",
-        ".cg-docs/solutions/testing-patterns/2026-08-20-milestone-2-country-explorer.md"
+        ".cg-docs/solutions/testing-patterns/2026-08-20-milestone-2-country-explorer.md",
+        ".cg-docs/solutions/testing-patterns/2026-08-31-milestone-3-country-profile.md",
+        ".cg-docs/solutions/testing-patterns/2026-09-01-milestone-4-country-comparison.md"
       ],
       "keywords": [
         "spir",
         "country explorer",
-        "test scenarios"
+        "country profile"
       ],
-      "label": "Spir / Country Explorer / Test Scenarios",
-      "slug": "spir-country-explorer-test-scenarios"
+      "label": "Spir / Country Explorer / Country Profile",
+      "slug": "spir-country-explorer-country-profile"
     }
   ]
 }

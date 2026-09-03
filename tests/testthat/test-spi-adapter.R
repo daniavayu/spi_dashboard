@@ -96,8 +96,8 @@ testthat::test_that("aggregate normalization retains official source rows", {
 
   result <- spi_normalize_aggregates(raw, year = 2024)
 
-  testthat::expect_equal(result$group_code, c("AFE", "HIC"))
-  testthat::expect_equal(result$score, c(55, 75))
+  testthat::expect_equal(result$group_code, c("AFE", "HIC", "AAA"))
+  testthat::expect_equal(result$score, c(55, 75, 80))
 })
 
 testthat::test_that("aggregate data is normalized to the application schema", {

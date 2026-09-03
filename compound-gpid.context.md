@@ -33,3 +33,7 @@ Milestone 2 Country Explorer: normalized country-level data, selectable shared y
 
 - Country Profile uses independent normalized section objects for header, overall series, pillars, dimensions, indicators, dimension extremes, and official-reference benchmarks. The module owns its country/year state and preserves explicit pending, partial, empty, unavailable, and error statuses.
 - The sibling `spiR` checkout is loaded with `devtools::load_all()` during development and verified before provider wiring. `spi_index()`, `spi_data()`, `country_info()`, `spi_aggregates()`, and `metadata()` provide the profile data; the external `spiR` repository remains untouched.
+
+### Completed Milestone 4
+
+- Compare Countries is an independent Golem module for up to three countries. It consumes the shared normalized snapshot, preserves missing values, and renders descriptive pillar, trend, and dimension-gap comparisons. The application server uses `spiR` first and falls back to the local provider only when the mandatory index cannot load; restarting after an `spiR` update refreshes dashboard data.
