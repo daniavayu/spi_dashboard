@@ -13,7 +13,8 @@ The dashboard currently includes:
 - Country Profile
 - Compare Countries
 - Trends & Progress
-- placeholder sections for future pillar and data-download functionality
+- Explore by Pillar
+- Data & Downloads
 
 ## Project structure
 
@@ -57,6 +58,10 @@ The app uses a layered approach:
 1. Data source abstraction
    - `spiR` is preferred as the source for SPI data.
    - Local fallback functions remain available in [functions](functions) and [R/spi_provider.R](R/spi_provider.R) for resilience and testability.
+    - The dashboard never writes to the sibling `spiR` repository. Its provider
+       boundary records the status of each optional operation and keeps the
+       normalized snapshot usable when metadata, indicators, or aggregates are
+       unavailable.
 
 2. Snapshot normalization
    - The snapshot loader consolidates index, metadata, and aggregate information.
@@ -69,6 +74,8 @@ The app uses a layered approach:
    - [R/mod_country_profile.R](R/mod_country_profile.R): detailed country dashboard
    - [R/mod_country_compare.R](R/mod_country_compare.R): multi-country comparisons
    - [R/mod_trends_progress.R](R/mod_trends_progress.R): trends and progress views
+   - [R/mod_pillar_explorer.R](R/mod_pillar_explorer.R): pillar-level country table
+   - [R/mod_data_downloads.R](R/mod_data_downloads.R): CSV downloads from the normalized snapshot
 
 ## Data and provider behavior
 
@@ -78,6 +85,28 @@ The dashboard is designed to normalize provider data before rendering UI. In pra
 - Local providers are used as fallback when required data is missing or unavailable.
 - The app keeps provider-specific logic separate from visualization code.
 - Missing values are handled consistently and displayed as blanks/`-` in the user interface.
+- The Overview map is an embedded Flourish visualization; its payload is prepared
+   by the dashboard and is not an `spiR` plot.
+- Pillar and dimension tables, comparisons, and Trends summaries are dashboard
+   calculations over the normalized snapshot. They preserve `NA` values rather
+   than imputing zeros.
+
+## Trends and numerical definitions
+
+- Annual global summaries use the median, interquartile range (IQR), number of
+   non-missing contributors, and number of countries represented in each year.
+- Official group trends use the matching aggregate supplied by the provider when
+   available. Their IQR and contributor counts are intentionally `NA`, because an
+   aggregate score is not a country-level sample.
+- Period change is `end - start` and is reported only for countries with both
+   endpoint scores.
+- Pillar stability is the standard deviation of observed year-over-year changes
+   within the selected period. It is descriptive and is not a convergence or
+   causal measure.
+- Pillar associations use Pearson correlation on complete pairs with at least
+   three observations and non-zero variation. They describe association only.
+- Coverage and unavailable states are shown explicitly; missing observations are
+   never converted to zero.
 
 ## Testing
 
@@ -95,6 +124,10 @@ The repo includes tests covering:
 - trend/progress calculations
 - dashboard integration points
 
+The deterministic suite is the release gate. Browser smoke coverage currently
+focuses on Country Profile and should be extended when a browser runner is
+available for the remaining tabs.
+
 ## Deployment notes
 
 This project is structured around a local development workflow and is not meant to be deployed by silently copying raw data into the repo. For deployment, use the RStudio/rsconnect workflow after validating the app locally.
@@ -105,6 +138,9 @@ This project is structured around a local development workflow and is not meant 
 - Prefer normalized snapshot data over raw provider objects in module code.
 - Do not add credentials or API keys to the repository.
 - Keep legacy visualization files in [viz_functions](viz_functions) unless they are intentionally migrated.
+- New screens must follow the Golem module boundary: namespaced `*_ui()` and
+   `*_server()` functions, injected snapshot loaders in tests, and no direct raw
+   provider calls from UI modules.
 
 ## Related files
 

@@ -20,28 +20,61 @@ trends_progress_ui <- function(id) {
   )
 }
 
-trends_progress_server <- function(id, snapshot_loader) {
+trends_progress_server <- function(id, snapshot_loader, active = function() TRUE) {
   shiny::moduleServer(id, function(input, output, session) {
-    snapshot <- shiny::reactive(snapshot_loader())
-    years <- shiny::reactive(trends_available_years(snapshot()))
-    metrics <- shiny::reactive(trends_metric_catalog(snapshot()$index))
-    groups <- shiny::reactive(trends_group_catalog(snapshot()))
+    snapshot <- shiny::reactiveVal(NULL)
+    shiny::observe({
+      if (isTRUE(active()) && is.null(snapshot())) {
+        snapshot(tryCatch(
+          snapshot_loader(),
+          error = function(error) list(
+            index = spi_empty_index(),
+            metadata = spi_empty_metadata(),
+            aggregates = spi_empty_aggregates(),
+            operation_status = list(
+              index = list(
+                ok = FALSE,
+                status = "error",
+                error = conditionMessage(error)
+              )
+            )
+          )
+        ))
+      }
+    })
+    snapshot_value <- shiny::reactive({
+      value <- snapshot()
+      if (is.null(value)) {
+        return(list(
+          index = spi_empty_index(),
+          metadata = spi_empty_metadata(),
+          aggregates = spi_empty_aggregates(),
+          operation_status = list()
+        ))
+      }
+      value
+    })
+    years <- shiny::reactive(trends_available_years(snapshot_value()))
+    metrics <- shiny::reactive(trends_metric_catalog(snapshot_value()$index))
+    groups <- shiny::reactive(trends_group_catalog(snapshot_value()))
 
     shiny::observeEvent(years(), {
       values <- years()
+      if (!length(values)) return()
       shiny::updateSelectInput(session, "start_year", choices = values, selected = min(values))
       shiny::updateSelectInput(session, "end_year", choices = values, selected = max(values))
-    }, once = TRUE)
+    })
     shiny::observeEvent(metrics(), {
       values <- metrics()
+      if (!nrow(values)) return()
       shiny::updateSelectInput(session, "metric", choices = stats::setNames(values$column, values$label), selected = "score")
-    }, once = TRUE)
+    })
     shiny::observeEvent(groups(), {
       values <- groups()
       choices <- c("Global" = "global")
       if (nrow(values)) choices <- c(choices, stats::setNames(values$code, paste0(values$name, " (", values$source, ")")))
       shiny::updateSelectInput(session, "group", choices = choices)
-    }, once = TRUE)
+    })
 
     period <- shiny::reactive({
       values <- years()
@@ -57,20 +90,20 @@ trends_progress_server <- function(id, snapshot_loader) {
       paste("Showing", period()[[1L]], "to", period()[[2L]])
     })
     output$global_trend <- shiny::renderPlot({
-      data <- trends_annual_summary(snapshot()$index, metric_column())
+      data <- trends_annual_summary(snapshot_value()$index, metric_column())
       data <- data[data$year >= period()[[1L]] & data$year <= period()[[2L]], , drop = FALSE]
       if (!nrow(data)) return(plot.new())
       graphics::plot(data$year, data$median, type = "o", pch = 16, col = "#0b9ed0", xlab = "Year", ylab = "Median score")
       graphics::arrows(data$year, data$median - data$iqr / 2, data$year, data$median + data$iqr / 2, code = 3, angle = 90, length = .05, col = "#8aa7b8")
     })
     output$group_trend <- shiny::renderPlot({
-      data <- trends_group_annual_summary(snapshot(), metric_column(), input$group %||% "global")
+      data <- trends_group_annual_summary(snapshot_value(), metric_column(), input$group %||% "global")
       data <- data[data$year >= period()[[1L]] & data$year <= period()[[2L]], , drop = FALSE]
       if (!nrow(data)) return(plot.new())
       graphics::plot(data$year, data$median, type = "o", pch = 16, col = "#27a36a", xlab = "Year", ylab = "Median score")
     })
     output$changes <- DT::renderDT({
-      data <- trends_period_changes(snapshot()$index, metric_column(), period()[[1L]], period()[[2L]])
+      data <- trends_period_changes(snapshot_value()$index, metric_column(), period()[[1L]], period()[[2L]])
       DT::datatable(
         data,
         rownames = FALSE,
@@ -81,14 +114,14 @@ trends_progress_server <- function(id, snapshot_loader) {
         DT::formatRound(columns = c("start_value", "end_value", "change"), digits = 1)
     })
     output$stability <- shiny::renderText({
-      data <- trends_pillar_stability_summary(snapshot()$index, metrics(), period()[[1L]], period()[[2L]])
+      data <- trends_pillar_stability_summary(snapshot_value()$index, metrics(), period()[[1L]], period()[[2L]])
       if (!nrow(data)) return("No pillar stability data available")
       available <- !is.na(data$value)
       if (!any(available)) return("Stability requires at least two valid year-to-year changes")
       sprintf("Based on %d valid pillar series; each requires at least two changes", sum(available))
     })
     output$stability_plot <- shiny::renderPlot({
-      data <- trends_pillar_stability_summary(snapshot()$index, metrics(), period()[[1L]], period()[[2L]])
+      data <- trends_pillar_stability_summary(snapshot_value()$index, metrics(), period()[[1L]], period()[[2L]])
       data <- data[!is.na(data$value), , drop = FALSE]
       if (!nrow(data)) {
         plot.new()
@@ -108,7 +141,7 @@ trends_progress_server <- function(id, snapshot_loader) {
     output$associations <- DT::renderDT({
       columns <- metrics()$column[metrics()$column != "score"]
       DT::datatable(
-        trends_pillar_associations(snapshot()$index, columns),
+        trends_pillar_associations(snapshot_value()$index, columns),
         rownames = FALSE,
         colnames = c("Pillar 1", "Pillar 2", "Pearson correlation", "Observations", "Status"),
         class = "compact stripe hover",

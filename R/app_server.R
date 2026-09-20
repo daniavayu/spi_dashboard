@@ -46,7 +46,8 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
   country_compare_server(
     "country_compare",
     snapshot_loader = explorer_loader,
-    handoff = compare_handoff
+    handoff = compare_handoff,
+    active = function() identical(input$main_nav, "Compare Countries")
   )
   profile_loader <- if (is.null(snapshot_loader)) {
     function() spi_profile_sections_from_snapshot(explorer_loader())
@@ -60,8 +61,23 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
   )
   trends_progress_server(
     "trends_progress",
-    snapshot_loader = explorer_loader
+    snapshot_loader = explorer_loader,
+    active = function() identical(input$main_nav, "Trends & Progress")
   )
+  if (exists("pillar_explorer_server", mode = "function")) {
+    pillar_explorer_server(
+      "pillar_explorer",
+      snapshot_loader = explorer_loader,
+      active = function() identical(input$main_nav, "Explore by Pillar")
+    )
+  }
+  if (exists("data_downloads_server", mode = "function")) {
+    data_downloads_server(
+      "data_downloads",
+      snapshot_loader = explorer_loader,
+      active = function() identical(input$main_nav, "Data & Downloads")
+    )
+  }
 
   output$overview_flourish_map <- shiny::renderUI({
     regions <- prepare_flourish_regions(overview$snapshot()$index)
@@ -121,9 +137,11 @@ app_server <- function(input, output, session, snapshot_loader = NULL) {
   output$kpi_countries <- shiny::renderText({
     nrow(overview_index_for_year(overview$snapshot(), overview$selected_year()))
   })
-  output$kpi_years <- shiny::renderText(
-    max(overview_years(overview$snapshot()))
-  )
+  output$kpi_years <- shiny::renderText({
+    years <- overview_years(overview$snapshot())
+    if (!length(years)) return("-")
+    max(years)
+  })
   output$kpi_year_count <- shiny::renderText({
     overview_year_count(overview$snapshot())
   })

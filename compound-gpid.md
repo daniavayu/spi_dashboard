@@ -2,7 +2,7 @@
 project-name: "Statistical Performance Indicators Dashboard"
 team: "DECDG / GPID -- World Bank"
 created: "2026-08-12"
-last-reviewed: "2026-08-12"
+last-reviewed: "2026-09-17"
 ---
 
 # Statistical Performance Indicators Dashboard
@@ -33,4 +33,7 @@ Provide a public English Shiny dashboard for the World Bank Statistical Performa
 
 ## Current Focus
 
-Implement Milestone 2: Country Explorer, including the contract normalizado de datos, el año global seleccionable y la tabla interactiva integrada con el proveedor `spiR` y su fallback local.
+Complete Milestone 5: Trends & Progress, including its final deterministic,
+integration, browser, and documentation validation. Milestones 1 through 4
+(Overview, Country Explorer, Country Profile, and Compare Countries) are
+implemented; Pillar exploration and Data & Downloads remain future scope.

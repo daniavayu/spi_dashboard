@@ -1,7 +1,7 @@
 ---
 date: 2026-08-31
 title: "Milestone 4: Country Comparison (Revised)"
-status: active
+status: completed
 scope: "Deep"
 brainstorm: "../brainstorms/2026-08-31-milestone-4-country-comparison.md"
 prior-plan: "2026-08-31-milestone-4-country-comparison.md"

@@ -69,23 +69,33 @@ spi_explorer_filter <- function(
         search_countries != "__all__"
     ]
   }
-  if (length(search_countries) > 0L) {
+  if (!is.null(region) && nzchar(region)) {
+    result <- result[
+      !is.na(result$region) & result$region == region, , drop = FALSE
+    ]
+  }
+  if (!is.null(income_group) && nzchar(income_group)) {
+    result <- result[
+      !is.na(result$income_group) & result$income_group == income_group,
+      , drop = FALSE
+    ]
+  }
+  if (length(search_countries) > 0L &&
+    (!is.null(region) && nzchar(region) ||
+      !is.null(income_group) && nzchar(income_group))) {
+    country_codes <- as.character(year_data$country_code)
+    country_names <- as.character(year_data$country_name)
+    matched <- spi_explorer_country_match(
+      search_countries, country_names, country_codes
+    )
+    result <- unique(rbind(result, year_data[matched, , drop = FALSE]))
+  } else if (length(search_countries) > 0L) {
     country_codes <- as.character(result$country_code)
     country_names <- as.character(result$country_name)
-    matched <- spi_explorer_country_match(search_countries, country_names, country_codes)
+    matched <- spi_explorer_country_match(
+      search_countries, country_names, country_codes
+    )
     result <- result[matched, , drop = FALSE]
-  } else {
-    if (!is.null(region) && nzchar(region)) {
-      result <- result[
-        !is.na(result$region) & result$region == region, , drop = FALSE
-      ]
-    }
-    if (!is.null(income_group) && nzchar(income_group)) {
-      result <- result[
-        !is.na(result$income_group) & result$income_group == income_group,
-        , drop = FALSE
-      ]
-    }
   }
   selected_for_compare <- as.character(selected_countries)
   selected_for_compare <- selected_for_compare[

@@ -147,7 +147,9 @@ overview_median_improvement <- function(
     return(NA_real_)
   }
   if (is.null(end_year)) {
-    end_year <- max(data$year[!is.na(data$score)], na.rm = TRUE)
+    valid_years <- data$year[!is.na(data$score) & !is.na(data$year)]
+    if (!length(valid_years)) return(NA_real_)
+    end_year <- max(valid_years)
   }
   data <- data[
     data$year %in% c(as.integer(start_year), as.integer(end_year)) &

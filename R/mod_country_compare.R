@@ -31,16 +31,46 @@ country_compare_server <- function(
   snapshot_loader = function() spi_provider_snapshot(load_details = TRUE),
   selected_countries = NULL,
   selected_year = NULL,
-  handoff = NULL
+  handoff = NULL,
+  active = function() TRUE
 ) {
   shiny::moduleServer(id, function(input, output, session) {
-    snapshot <- shiny::reactive(snapshot_loader())
+    snapshot <- shiny::reactiveVal(NULL)
+    shiny::observe({
+      if (isTRUE(active()) && is.null(snapshot())) {
+        snapshot(tryCatch(
+          snapshot_loader(),
+          error = function(error) list(
+            index = spi_empty_index(),
+            dimension_labels = spi_empty_dimension_labels(),
+            operation_status = list(
+              index = list(
+                ok = FALSE,
+                status = "error",
+                error = conditionMessage(error)
+              )
+            )
+          )
+        ))
+      }
+    })
+    snapshot_value <- shiny::reactive({
+      value <- snapshot()
+      if (is.null(value)) {
+        return(list(
+          index = spi_empty_index(),
+          dimension_labels = spi_empty_dimension_labels(),
+          operation_status = list()
+        ))
+      }
+      value
+    })
     countries <- shiny::reactiveVal(character())
     year <- shiny::reactiveVal(NULL)
     handoff_consumed <- FALSE
 
     catalog <- shiny::reactive({
-      data <- snapshot()$index
+      data <- snapshot_value()$index
       if (!is.data.frame(data) || !"country_code" %in% names(data)) character() else unique(as.character(data$country_code))
     })
 
@@ -69,10 +99,12 @@ country_compare_server <- function(
 
     shiny::observe({
       incoming <- if (is.null(handoff)) NULL else handoff()
-      if (!handoff_consumed && !is.null(incoming)) {
+      if (!handoff_consumed && !is.null(incoming) && length(catalog()) > 0L) {
         result <- spi_compare_canonicalize_selection(incoming, catalog())
-        if (result$ok) countries(result$countries)
-        handoff_consumed <<- TRUE
+        if (result$ok) {
+          countries(result$countries)
+          handoff_consumed <<- TRUE
+        }
       }
     })
 
@@ -83,7 +115,7 @@ country_compare_server <- function(
     })
 
     shiny::observe({
-      available <- spi_compare_global_year(snapshot()$index, countries())
+      available <- spi_compare_global_year(snapshot_value()$index, countries())
       if (is.null(year()) || is.na(year()) || (!is.na(available) && year() > available)) {
         if (!is.na(available)) year(available)
       }
@@ -111,10 +143,10 @@ country_compare_server <- function(
       year(suppressWarnings(as.integer(input$compare_year_input)))
     }, ignoreInit = TRUE)
 
-    pillar_data <- shiny::reactive(spi_compare_pillars(snapshot()$index, countries(), year()))
-    trend_data <- shiny::reactive(spi_compare_trends(snapshot()$index, countries(), "overall"))
+    pillar_data <- shiny::reactive(spi_compare_pillars(snapshot_value()$index, countries(), year()))
+    trend_data <- shiny::reactive(spi_compare_trends(snapshot_value()$index, countries(), "overall"))
     dimension_data <- shiny::reactive(spi_compare_dimension_gaps(
-      snapshot()$index, countries(), year(), snapshot()$dimension_labels
+      snapshot_value()$index, countries(), year(), snapshot_value()$dimension_labels
     ))
 
     output$compare_pillars <- shiny::renderPlot({

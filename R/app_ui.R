@@ -208,10 +208,10 @@ app_ui <- function(request = NULL) {
         shiny::tabPanel("Trends & Progress",
           trends_progress_ui("trends_progress")),
         shiny::tabPanel("Explore by Pillar",
-          shiny::div(class = "spi-placeholder", shiny::div(shiny::h2("Explore by Pillar"), shiny::p("Pillar and dimension exploration will be available in a future iteration.")))
+          pillar_explorer_ui("pillar_explorer")
         ),
         shiny::tabPanel("Data & Downloads",
-          shiny::div(class = "spi-placeholder", shiny::div(shiny::h2("Data & Downloads"), shiny::p("Data access tools will be available in a future iteration.")))
+          data_downloads_ui("data_downloads")
         )
       )
       )
