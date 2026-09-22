@@ -14,7 +14,7 @@ The dashboard currently includes:
 - Compare Countries
 - Trends & Progress
 - Explore by Pillar
-- Data & Downloads
+- Data & Downloads (in progress; see [Known gaps](#known-gaps))
 
 ## Project structure
 
@@ -23,7 +23,6 @@ The dashboard currently includes:
 - [functions](functions): legacy/data-access helpers and provider wrappers
 - [tests/testthat](tests/testthat): automated regression and UI/data validation tests
 - [inst](inst): app config and static assets
-- [viz_functions](viz_functions): visualization helpers and legacy chart code
 - [DESCRIPTION](DESCRIPTION): package metadata and dependencies
 
 ## Run locally
@@ -74,7 +73,12 @@ The app uses a layered approach:
    - [R/mod_country_profile.R](R/mod_country_profile.R): detailed country dashboard
    - [R/mod_country_compare.R](R/mod_country_compare.R): multi-country comparisons
    - [R/mod_trends_progress.R](R/mod_trends_progress.R): trends and progress views
-   - [R/mod_pillar_explorer.R](R/mod_pillar_explorer.R): pillar-level country table
+   - [R/mod_pillar_explorer.R](R/mod_pillar_explorer.R): exploratory pillar-level
+     analysis for a single country/year. Shows official pillar scores as cards
+     (with year-over-year change and weighted contribution), lets the user set
+     custom integer weights (must sum to 100) to compute an exploratory score
+     distinct from the official SPI, and includes a pillar correlation heatmap
+     and a cross-pillar scatter explorer with selectable X/Y pillars.
    - [R/mod_data_downloads.R](R/mod_data_downloads.R): CSV downloads from the normalized snapshot
 
 ## Data and provider behavior
@@ -124,9 +128,28 @@ The repo includes tests covering:
 - trend/progress calculations
 - dashboard integration points
 
-The deterministic suite is the release gate. Browser smoke coverage currently
-focuses on Country Profile and should be extended when a browser runner is
-available for the remaining tabs.
+The deterministic suite is the release gate. Browser smoke coverage
+(`tests/browser`, using `shinytest2` + headless Chrome via `chromote`) spans
+all six ready tabs — Country Explorer, Country Profile, Compare Countries,
+Trends & Progress, and Explore by Pillar — against a shared fixture app
+(`tests/browser/fixture-app`). Run a smoke test with:
+
+```r
+Rscript tests/browser/country-profile-smoke.R
+```
+
+Note: `shinytest2::AppDriver$new()` must set both `load_timeout` (initial page
+load) and `timeout` (used internally by `wait_for_idle()` on every
+`set_window_size()`/`click()`); the default `timeout` (~15s) is too short once
+the app's full reactive graph is loaded.
+
+## Known gaps
+
+- **Data & Downloads** (`R/mod_data_downloads.R`) is the one tab that is not
+  yet finished: it has no dedicated `tests/testthat` coverage and its UI does
+  not yet follow the `spi-card`/`spi-panel` visual system used by the other
+  six tabs. Tracked as `milestone-7-data-downloads` in `roadmap.json`. It is
+  also the only tab without browser smoke coverage.
 
 ## Deployment notes
 
@@ -137,7 +160,6 @@ This project is structured around a local development workflow and is not meant 
 - Keep [app.R](app.R) as the canonical launch entry point.
 - Prefer normalized snapshot data over raw provider objects in module code.
 - Do not add credentials or API keys to the repository.
-- Keep legacy visualization files in [viz_functions](viz_functions) unless they are intentionally migrated.
 - New screens must follow the Golem module boundary: namespaced `*_ui()` and
    `*_server()` functions, injected snapshot loaders in tests, and no direct raw
    provider calls from UI modules.

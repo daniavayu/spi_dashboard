@@ -1,3 +1,14 @@
+# Official SPI pillar names (1-5), shared across profile radar and compare charts.
+spi_pillar_short_labels <- function() {
+  c(
+    `1` = "Pillar 1:\nData Use",
+    `2` = "Pillar 2:\nData Services",
+    `3` = "Pillar 3:\nData Products",
+    `4` = "Pillar 4:\nData Sources",
+    `5` = "Pillar 5:\nData Infrastructure"
+  )
+}
+
 spi_profile_coord_radar <- function(theta = "x", start = 0, direction = 1) {
   theta <- match.arg(theta, c("x", "y"))
   radius <- if (theta == "x") "y" else "x"
@@ -81,13 +92,7 @@ spi_profile_pillar_radar <- function(data, country_code, year) {
     graphics::text(0.5, 0.5, "No pillar radar data available")
     return(invisible(NULL))
   }
-  labels <- c(
-    `1` = "Pillar 1:\nData Use",
-    `2` = "Pillar 2:\nData Services",
-    `3` = "Pillar 3:\nData Products",
-    `4` = "Pillar 4:\nData Sources",
-    `5` = "Pillar 5:\nData Infrastructure"
-  )
+  labels <- spi_pillar_short_labels()
   data$pillar <- factor(data$pillar, levels = as.character(1:5),
     labels = unname(labels[as.character(1:5)]))
   data$series <- factor(data$series, levels = c("country", "region"))

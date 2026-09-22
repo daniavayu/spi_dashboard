@@ -152,8 +152,15 @@ country_compare_server <- function(
     output$compare_pillars <- shiny::renderPlot({
       data <- pillar_data()$data
       if (nrow(data) == 0L) return(plot.new())
+      data$pillar_id <- factor(
+        data$pillar_id, levels = as.character(1:5),
+        labels = unname(spi_pillar_short_labels()[as.character(1:5)])
+      )
       ggplot2::ggplot(data, ggplot2::aes(x = pillar_id, y = score, fill = country_code)) +
-        ggplot2::geom_col(position = "dodge", na.rm = FALSE) + ggplot2::scale_y_continuous(limits = c(0, 100)) + ggplot2::theme_minimal()
+        ggplot2::geom_col(position = "dodge", na.rm = FALSE) +
+        ggplot2::scale_y_continuous(limits = c(0, 100)) +
+        ggplot2::labs(x = NULL) +
+        ggplot2::theme_minimal()
     })
     output$compare_plot <- shiny::renderPlot({
       data <- trend_data()$data

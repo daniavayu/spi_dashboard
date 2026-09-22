@@ -1,24 +1,31 @@
 {
   "schemaVersion": "compound-gpid-active-state-v1",
-  "updatedAt": "2026-09-17T00:00:00Z",
+  "updatedAt": "2026-09-21T00:00:00Z",
   "workflow": "/cg-work",
-  "status": "active",
+  "status": "completed",
   "branch": "main",
-  "plan": ".cg-docs/plans/2026-09-01-milestone-5-trends-progress.md",
-  "executionReport": ".cg-docs/work-reports/2026-09-17-milestone-5-trends-progress.md",
+  "plan": ".cg-docs/plans/2026-09-20-milestone-6-explore-by-pillar-revised.md",
+  "executionReport": ".cg-docs/work-reports/2026-09-20-milestone-6-explore-by-pillar-revised.md",
   "currentPhase": 4,
   "evidenceStatus": [
-    {"id": "V1", "status": "pending", "artifact": "Trends pure helper tests"},
-    {"id": "V2", "status": "pending", "artifact": "Trends module tests"},
-    {"id": "V3", "status": "pending", "artifact": "application integration tests"},
-    {"id": "V4", "status": "pending", "artifact": "full deterministic test suite"},
-    {"id": "V5", "status": "pending", "artifact": "desktop/mobile browser smoke"},
-    {"id": "V6", "status": "pending", "artifact": "documentation and visualization mapping review"}
+    {"id": "V1", "status": "passed", "artifact": ".cg-docs/work-reports/2026-09-20-milestone-6-explore-by-pillar-revised.md"},
+    {"id": "V2", "status": "passed", "artifact": "tests/testthat/test-pillar-explorer-data.R; full tests/testthat gate"},
+    {"id": "V3", "status": "passed", "artifact": "tests/testthat/test-pillar-explorer-helpers.R"},
+    {"id": "V4", "status": "passed", "artifact": "tests/testthat/test-pillar-explorer-helpers.R"},
+    {"id": "V5", "status": "passed", "artifact": "tests/testthat/test-pillar-explorer-data.R and helpers"},
+    {"id": "V6", "status": "passed", "artifact": "tests/testthat/test-pillar-explorer-module.R (shiny::testServer)"},
+    {"id": "V7", "status": "passed", "artifact": "tests/testthat/test-pillar-explorer-module.R; full tests/testthat gate, 0 failures"},
+    {"id": "V8", "status": "passed", "artifact": "tests/browser/pillar-explorer-smoke.R passes against enriched tests/browser/fixture-app snapshot (5 pillar columns, 3 countries x 3 years)"},
+    {"id": "V9", "status": "passed", "artifact": "tests/browser/country-explorer-smoke.R, compare-countries-smoke.R, trends-progress-smoke.R, pillar-explorer-smoke.R all pass; country-profile-smoke.R fixed (added timeout=120000 to AppDriver$new) and re-verified"}
+    {"id": "V10", "status": "passed", "artifact": "README.md updated to describe pillar cards, custom weighting, correlations, and cross-pillar explorer"},
+    {"id": "V11", "status": "passed", "artifact": "get_errors clean across R/"}
   ],
-  "unresolvedDecisions": [],
   "artifactRefs": [
-    {"kind": "plan", "path": ".cg-docs/plans/2026-09-01-milestone-5-trends-progress.md", "status": "active"},
-    {"kind": "report", "path": ".cg-docs/work-reports/2026-09-17-milestone-5-trends-progress.md", "status": "active"}
+    {"kind": "plan", "path": ".cg-docs/plans/2026-09-20-milestone-6-explore-by-pillar-revised.md", "status": "done"},
+    {"kind": "report", "path": ".cg-docs/work-reports/2026-09-20-milestone-6-explore-by-pillar-revised.md", "status": "done"}
   ],
-  "nextCommand": "/cg-work phase4"
+  "unresolvedDecisions": [
+    "Data & Downloads (milestone-7-data-downloads) has no dedicated plan or test coverage yet and is the one tab intentionally left as work-in-progress, including no browser smoke test."
+  ],
+  "nextCommand": "/cg-work milestone-7-data-downloads"
 }

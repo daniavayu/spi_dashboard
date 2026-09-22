@@ -5,6 +5,7 @@ app <- AppDriver$new(
   app_dir = normalizePath(file.path("tests", "browser", "fixture-app")),
   name = "country-profile-smoke",
   load_timeout = 120000,
+  timeout = 120000,
   check_names = FALSE
 )
 on.exit(app$stop(), add = TRUE)

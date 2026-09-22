@@ -61,13 +61,41 @@
       "id": "milestone-5-trends-progress",
       "title": "Milestone 5: Trends and Progress",
       "objective": "Deliver reproducible global and official-group trend analysis with coverage and descriptive progress measures.",
-      "status": "in-progress",
+      "status": "done",
       "features": [
         {
           "id": "trends-progress",
           "title": "Trends & Progress module and application integration",
-          "status": "active",
+          "status": "done",
           "plan": ".cg-docs/plans/2026-09-01-milestone-5-trends-progress.md"
+        }
+      ]
+    },
+    {
+      "id": "milestone-6-explore-by-pillar",
+      "title": "Milestone 6: Explore by Pillar and Custom Weighting",
+      "objective": "Enable exploratory pillar-level analysis with user-defined weighting while keeping the official SPI distinct.",
+      "status": "done",
+      "features": [
+        {
+          "id": "explore-by-pillar-and-custom-weighting",
+          "title": "Milestone 6: Explore by Pillar and Custom Weighting",
+          "status": "done",
+          "plan": ".cg-docs/plans/2026-09-20-milestone-6-explore-by-pillar-revised.md"
+        }
+      ]
+    },
+    {
+      "id": "milestone-7-data-downloads",
+      "title": "Milestone 7: Data & Downloads",
+      "objective": "Provide a validated, tested dataset download screen (index, metadata, aggregates, indicators) built on the normalized snapshot.",
+      "status": "in-progress",
+      "features": [
+        {
+          "id": "data-downloads",
+          "title": "Data & Downloads CSV export module",
+          "status": "active",
+          "plan": null
         }
       ]
     }
